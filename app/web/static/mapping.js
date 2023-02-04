@@ -1,6 +1,9 @@
 // loads map on page load
 window.onload = buildMap();
 
+// INSERT BACKEND URL
+var backEndUrl = "";
+
 // adds tile layers
 function buildMap() {
     var map = L.map('map').setView([51.505, -0.09], 13);
@@ -10,22 +13,38 @@ function buildMap() {
 
     }).addTo(map);
     buildDummy(map);
+    //getDropOffBoxes(map);
+}
+
+// GET requesets
+async function getDropOffBoxes(map) {
+    const response = await fetch( backEndUrl + '/user/create');
+    const listOfDropboxes = await response.json();
+    var pointList = [];
+    for (let i = 0; i < listOfDropboxes.length; i++) {
+        var box = listOfDropboxes[i]
+        pointList.push([box.xCoord, box.yCoord, box.destinationBool, 500])
+    }
+    buildLocations(pointList, [], map);
+}
+
+function buildLocations(circleData, pointData, map) {
+    for (let i = 0; i < circleData.length; i++) {
+        var p = circleData[i];
+        //  xCoord, yCoord, is it a destination and circle radius
+        addCircle(p[0], p[1], p[2], p[3]).addTo(map);
+    }
+    for (let i = 0; i < pointData.length; i++) {
+        var p = pointData[i];
+        //  xCoord, yCoord, is it a destination and popup data
+        addDropOffBox(p[0], p[1], p[2]).bindPopup(p[3]).addTo(map);
+    }
 }
 
 function buildDummy(map) {
     var circleData = [[51.53, -0.092, true, 500],[51.54, -0.091, false, 500]]
     var pointData = [[51.53, -0.092, true, "Post Box"],[51.54, -0.091, false, "Drop Point"]]
-    for (let i = 0; i < circleData.length; i++) {
-        var p = circleData[i]
-        //  xCoord, yCoord, is it a destination and circle radius
-        addCircle(p[0], p[1], p[2], p[3]).addTo(map);
-    }
-    for (let i = 0; i < pointData.length; i++) {
-        var p = pointData[i]
-        //  xCoord, yCoord, is it a destination and popup data
-        addDropOffBox(p[0], p[1], p[2]).bindPopup(p[3]).addTo(map);
-    }
-    
+    buildLocations(circleData, pointData, map);
 }
 
 function addCircle(xCoord, yCoord, destinationBool, radius) {

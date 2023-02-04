@@ -1,0 +1,14 @@
+{
+    "name": "DeliverU",
+    "short_name": "DeliverU",
+    "start_url": "/frontend/index.html",
+    "theme_color": "#000000",
+    "background_color": "#ffffff",
+    "lang": "en",
+    "icons": [
+        {
+            "src": "/icon/applogo.png",
+            "sizes": "128x128"
+        }
+    ]
+}

@@ -10,6 +10,7 @@ class Edge:
     start_time : datetime.time
     duration: datetime.timedelta
 
+### Arc is a (start_id, end_id, stime, duration)
 class Graph:
 
     MAX_DAYS = 99999999
@@ -19,6 +20,12 @@ class Graph:
 
     def add_edge(self, u, v, start_dt : datetime.time, duration):
         self.edges[u].append(Edge(v, start_dt, duration))
+
+    def build_graph(self, arcs):
+
+        for arc in arcs:
+            self.add_edge(*arc)
+
 
     def find_best(self, start_id, end_id):
         # TODO - Fix when to start date, at the moment just 04/01/2023 at 9am
@@ -100,8 +107,8 @@ def route_parcel(start_node_id, end_node_id, edgeList):
 
 
 if __name__ == "__main__":
-    #testdate = datetime.datetime(2023, 1, 4, 9, 3, 1)
-
+    testdate = datetime.datetime(2023, 1, 4, 9, 3, 1)
+    print(testdate.strftime("%d/%m/%Y, %H:%M:"))
     #print(route_parcel(0,1, [(0,1, testdate.time(), datetime.timedelta(hours = 2))]))
 
     tgraph = Graph()

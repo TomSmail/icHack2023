@@ -88,8 +88,26 @@ async def estimatedDeliveryTime():
 
     ### start_locker, end_locker, current_time
     ### Get the journeys and nodes from the database
+    ### journeys = [Journey]
+    ### nodes = [Nodes]
+
+
 
     g = Graph()
+
+    arcs = getArcs(journeys, nodes)
+
+    g.build_graph(arcs)
+
+    best = g.find_best(start_locker, end_locker)
+
+
+    #{"deliveryTime" :""}
+    return "{'deliveryTime': '" + best.strftime("%d/%m/%Y, %H:%M:")+"'}", 200
+
+
+
+
 
 
 

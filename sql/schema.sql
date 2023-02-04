@@ -56,12 +56,15 @@ CREATE TABLE route(
 );
 
 CREATE TABLE routeEvent(
-    timeOccurs timestamp,
+    leaveTime timestamp,
+    arrivalTime timestamp,
     nextLockerId INTEGER,
+    currLockerId INTEGER,
     routeId INTEGER,
     parcelId INTEGER,
     FOREIGN KEY (parcelId) REFERENCES parcel(parcelId),
     FOREIGN KEY (nextLockerId) REFERENCES locker(lockerId),
+    FOREIGN KEY (currLockerId) REFERENCES locker(lockerId),	
     FOREIGN KEY (routeId) REFERENCES route(routeId)
 );
 	

@@ -34,18 +34,12 @@ CREATE TABLE IF NOT exists journey(
     FOREIGN key(distributorId) REFERENCES distributor(distributorId)
 );
 
-create table IF NOT exists point(
-    pointId SERIAL primary key,
-    latitude real,
-    longitude real
-);
-
 create table IF NOT exists journeyPoint(
     ordinalNumber SERIAL,
     journeyId INTEGER,
-    pointId INTEGER,
-    foreign key(journeyId) references journey(journeyId),
-    foreign key(pointId) references point(pointId)
+    latitude real,
+    longitude real,
+    foreign key(journeyId) references journey(journeyId)
 );
 
 CREATE TABLE route(

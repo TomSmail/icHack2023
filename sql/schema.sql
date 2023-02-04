@@ -1,12 +1,12 @@
-CREATE TABLE locker(
-    lockerId INTEGER PRIMARY KEY AUTOINCREMENT,
+create table locker(
+    lockerId SERIAL primary key ,
     capacity INTEGER,
-    latitude REAL,
-    longitude REAL
+    latitude real,
+    longitude real
 );
 
 CREATE TABLE parcel(
-    parcelId INTEGER PRIMARY KEY AUTOINCREMENT,
+    parcelId  SERIAL PRIMARY KEY,
     dateIntoSystem DATE,
     dateIntoLocker DATE,
     lockerIn INTEGER,
@@ -23,23 +23,23 @@ CREATE TABLE user(
 );
 
 CREATE TABLE journey(
-    journeyId INTEGER PRIMARY KEY AUTOINCREMENT,
+    journeyId SERIAL PRIMARY KEY,
     startTime TIME, 
     endTime TIME,
     userId INTEGER,
-    FOREIGN KEY userId REFERENCES user.userId
+    FOREIGN key(userId) REFERENCES user.userId
 );
 
-CREATE TABLE point(
-    pointId INTEGER PRIMARY KEY AUTOINCREMENT,
-    latitude REAL,
-    longitude REAL
+create table point(
+    pointId SERIAL primary key,
+    latitude real,
+    longitude real
 );
 
-CREATE TABLE journeyPoint(
+create table journeyPoint(
     ordinalNumber INTEGER,
     journeyId INTEGER,
     pointId INTEGER,
-    FOREIGN KEY journeyId REFERENCES journey.journeyId,
-    FOREIGN KEY pointId REFERENCES point.pointId
+    foreign key(journeyId) references journey.journeyId,
+    foreign key(pointId) references point.pointId
 );

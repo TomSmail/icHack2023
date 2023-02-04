@@ -16,13 +16,13 @@ CREATE TABLE  IF NOT exists parcel(
     FOREIGN KEY(destinationLocker) REFERENCES locker(lockerId)
 );
 
-CREATE TABLE  IF NOT exists distributor(
+CREATE TABLE IF NOT exists distributor(
     distributorId SERIAL PRIMARY KEY,
     balance DECIMAL(10, 2),
     username VARCHAR(50),
     pfpUrl VARCHAR(100),
     failedDeliveries INTEGER,
-    succeededDeliveries INTEGER,
+    succeededDeliveries INTEGER
     -- also need some way to hit them up via push notifications
 );
 
@@ -41,7 +41,7 @@ create table IF NOT exists point(
 );
 
 create table IF NOT exists journeyPoint(
-    ordinalNumber INTEGER,
+    ordinalNumber SERIAL,
     journeyId INTEGER,
     pointId INTEGER,
     foreign key(journeyId) references journey(journeyId),
@@ -49,17 +49,19 @@ create table IF NOT exists journeyPoint(
 );
 
 CREATE TABLE route(
-    routeId INTEGER,
-    userDoing INTEGER
+    routeId SERIAL primary key,
+    userDoing INTEGER,
     parcelId INTEGER,
-    FOREIGN KEY userDoing REFERENCES user.userId    
+    FOREIGN KEY (userDoing) REFERENCES distributor(distributorId)   
 );
 
 CREATE TABLE routeEvent(
-    timeOccurs DATETIME,
+    timeOccurs timestamp,
     nextLockerId INTEGER,
     routeId INTEGER,
-    FOREIGN KEY parcelId REFERENCES parcel.parcelId,
-    FOREIGN KEY nextLockerId REFERENCES locker.lockerId,
-    FOREIGN KEY routeId REFERENCES route.routeId
+    parcelId INTEGER,
+    FOREIGN KEY (parcelId) REFERENCES parcel(parcelId),
+    FOREIGN KEY (nextLockerId) REFERENCES locker(lockerId),
+    FOREIGN KEY (routeId) REFERENCES route(routeId)
 );
+	

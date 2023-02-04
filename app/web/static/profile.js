@@ -1,18 +1,27 @@
 window.onload = buildDummy();
 
 function buildDummy() {
-    profileButton("Bob Ross", "420.69", "/bobross.jpeg")
+    profileButton("Bob Ross", "420.69", "./bobross.jpeg")
 }
 
 function profileButton(name, balance, profilePicUrl) {
-    const userBalance  = document.createTextNode('balance');
-    const userName = document.createElement('name');
-    const node = document.createElement('');
-    const profilePic = document.createElement('pfp')
-    const img = document.createElement("img");
+
+    var elem = document.createElement('div');
+    var container = document.getElementById('name');
+    container.appendChild(elem);
+    elem.innerHTML = name;
+
+    var elem2 = document.createElement('div');
+    var container2 = document.getElementById('balance');
+    container2.appendChild(elem2);
+    elem2.innerHTML = balance;
+
+    var elem3 = document.createElement('div');
+    var container3 = document.getElementById('imgcontainer');
+    const img = document.createElement('img');
     img.src = profilePicUrl;
-    profilePic.document.append(img);
-    userName.document.append(name);
-    userBalance.document.append(balance);
-    document.getElementById("profile").insertAdjacentElement('beforeBegin', node);
+    elem3.appendChild(img);
+    container3.appendChild(elem3);
+    
+    //document.getElementById("profile").insertAdjacentElement('beforeBegin', node);
 }

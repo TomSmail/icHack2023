@@ -16,14 +16,25 @@
         integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
     <!-- link to javascript, requires defer to load js after "map" initialised-->
     <script src="mapping.js" defer></script>
-
+    <!-- enables profile page being added -->
+    <script src="profile.js" defer></script>
 
 </head>
 
 <body>
+    <div class="main-container">
+        <div class="primary">
+            <div id="map"></div>
 
-    <div id="map"></div>
-    
+            <div class="container">
+                <div class="profile-photo" onclick="profileButton()"></div>
+            </div>
+        </div>
+        <div class="secondary">
+            <div id="profile"></div>
+        </div>
+
+    </div>
 </body>
 
 </html>

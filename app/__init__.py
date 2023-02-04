@@ -20,8 +20,3 @@ app.register_blueprint(apibp, url_prefix="/api",)
 app.register_blueprint(webbp, )
 
 app.db = Database(app)
-
-
-@app.route("/bleh")
-async def index():
-    print(await app.db.execute("SELECT COUNT(*) FROM mytable"))

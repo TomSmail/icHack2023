@@ -66,11 +66,11 @@ html {
 
 }
 
-
 .profile {
     display: flex;
     flex-direction: row;
 }
+
 
 .imgcontainer {
     width: 20%;

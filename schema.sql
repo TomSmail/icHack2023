@@ -17,9 +17,13 @@ CREATE TABLE parcel(
 );
 
 CREATE TABLE user(
+    userId INTEGER PRIMARY KEY AUTOINCREMENT,
     balance DECIMAL(10, 2),
+    username VARCHAR(50),
+    pfpUrl VARCHAR(100)
     failedDeliveries INTEGER,
-    succeededDeliveries INTEGER
+    succeededDeliveries INTEGER,
+    -- also need some way to hit them up via push notifications
 );
 
 CREATE TABLE journey(
@@ -42,4 +46,20 @@ CREATE TABLE journeyPoint(
     pointId INTEGER,
     FOREIGN KEY journeyId REFERENCES journey.journeyId,
     FOREIGN KEY pointId REFERENCES point.pointId
+);
+
+CREATE TABLE route(
+    routeId INTEGER,
+    userDoing INTEGER
+    parcelId INTEGER,
+    FOREIGN KEY userDoing REFERENCES user.userId    
+);
+
+CREATE TABLE routeEvent(
+    timeOccurs DATETIME,
+    nextLockerId INTEGER,
+    routeId INTEGER,
+    FOREIGN KEY parcelId REFERENCES parcel.parcelId,
+    FOREIGN KEY nextLockerId REFERENCES locker.lockerId,
+    FOREIGN KEY routeId REFERENCES route.routeId
 );

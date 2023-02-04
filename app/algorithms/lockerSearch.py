@@ -92,6 +92,16 @@ class Graph:
 
 
 
+def route_parcel(start_node_id, end_node_id, edgeList):
+
+    g = Graph()
+    for (start_id, end_id, stime, duration) in edgeList:
+        print(type(stime))
+
+
+
+print(route_parcel(0,1, [(0,1, datetime.datetime)]))
+
 """
 tgraph = Graph()
 

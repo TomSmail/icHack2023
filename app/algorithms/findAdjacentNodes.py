@@ -80,20 +80,20 @@ class Journey:
 
 
 
-
-t1 = Point(52.1951, 0.1313)
-t2 = Point(51.5072, 0.1276)
-
-
-
-print(type(datetime.datetime(2023, 1, 4, 12, 2, 1).time()) is datetime.time)
-
-print(nearBy(t1,t2,0)) ### About 75km away as expected
+if __name__ == "__main__":
+    t1 = Point(52.1951, 0.1313)
+    t2 = Point(51.5072, 0.1276)
 
 
 
-## datetime.time (h,m,s)
-## datetime.datetime (yy, m, d) h, m, s t1-t2 timedelta object
+    print(type(datetime.datetime(2023, 1, 4, 12, 2, 1).time()) is datetime.time)
+
+    print(nearBy(t1,t2,0)) ### About 75km away as expected
+
+
+
+    ## datetime.time (h,m,s)
+    ## datetime.datetime (yy, m, d) h, m, s t1-t2 timedelta object
 
 
 

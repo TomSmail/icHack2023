@@ -17,7 +17,6 @@ body,
     -ms-filter: grayscale(100%);
     -o-filter: grayscale(100%);
     filter: grayscale(100%);
-<<<<<<< HEAD
     filter: gray;
 }
 
@@ -48,6 +47,3 @@ body,
     
     }
 } */
-=======
-}
->>>>>>> 36c0c60441aa92b8a990a6bdd61a25774f246622

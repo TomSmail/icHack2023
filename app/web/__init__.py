@@ -1,7 +1,6 @@
 from quart import Blueprint, send_file, current_app
 
-webbp = Blueprint('web', __name__, static_folder='./static',
-                  template_folder='./templates')
+webbp = Blueprint('web', __name__, static_folder='./static')
 
 
 @webbp.route('/')

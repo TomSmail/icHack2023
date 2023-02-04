@@ -1,4 +1,5 @@
-
+from geopy import distance
+import datetime
 # point = someone's possible pickup or dropoff locations
 # node = locker
 # arc = locker to locker
@@ -27,7 +28,9 @@ def getAdjNodesDict(journeys, nodes):
             for endNode in pointNodesDict[journey.endLoc]:
                 # adds the nodes that are adjacent to the start nodes to a list
                 # which is then added to the dictionary later
-                startNodeAdjNodes.append([startNode.id, endNode.id, journey.startTime, journey.endTime - journey.startTime])
+                assert type(journey.startTime) == datetime.datetime
+
+                startNodeAdjNodes.append([startNode.id, endNode.id, journey.startTime.time(), journey.endTime - journey.startTime])
         adjNodesDict[startNode] = startNodeAdjNodes
     return adjNodesDict
 
@@ -54,5 +57,36 @@ def getPointNodesDict(journeys, nodes):
     return pointNodesDict
 
 def nearBy(p1, p2, dist):
-    return ((p1.lat - p2.lat) ^ 2 + (p1.long - p2.long) ^ 2) ** 2 <= dist
+    return distance.distance((p1.lat, p1.long), (p2.lat, p2.long)).meters <= dist
+
+
+# import dataclasses
+# @dataclasses.dataclass
+#
+# class Node:
+#     pass
+#
+#
+# @dataclasses.dataclass
+# class Point:
+#     lat : float
+#     long: float
+#
+#
+# t1 = Point(52.1951, 0.1313)
+# t2 = Point(51.5072, 0.1276)
+#
+#
+#
+# print(type(datetime.datetime(2023, 1, 4, 12, 2, 1).time()) is datetime.time)
+#
+# print(nearBy(t1,t2,0)) ### About 75km away as expected
+#
+#
+#
+# ## datetime.time (h,m,s)
+# ## datetime.datetime (yy, m, d) h, m, s t1-t2 timedelta object
+#
+
+
 

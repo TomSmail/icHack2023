@@ -17,6 +17,6 @@ app.config.from_prefixed_env()
 app.config.from_file("../config.toml", toml.load)
 
 app.register_blueprint(apibp, url_prefix="/api",)
-app.register_blueprint(webbp, )
+app.register_blueprint(webbp,)
 
 app.db = Database(app)

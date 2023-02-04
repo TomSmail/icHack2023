@@ -1,9 +1,12 @@
 body {
     padding: 0;
     margin: 0;
-    
+
 }
-html, body, #map {
+
+html,
+body,
+#map {
     height: 100%;
     width: 100vw;
 }
@@ -14,6 +17,7 @@ html, body, #map {
     -ms-filter: grayscale(100%);
     -o-filter: grayscale(100%);
     filter: grayscale(100%);
+<<<<<<< HEAD
     filter: gray;
 }
 
@@ -44,3 +48,6 @@ html, body, #map {
     
     }
 } */
+=======
+}
+>>>>>>> 36c0c60441aa92b8a990a6bdd61a25774f246622

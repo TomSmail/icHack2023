@@ -85,7 +85,10 @@ async def estimatedDeliveryTime():
     # call Luke's algorithm
 
     ##
-
+    journeys = await current_app.db.execute("SELECT startTime endTime FROM journey")
+    user_id = awaitcurrent_app.db.fetchrow(
+        "SELECT userDoing FROM route JOIN routeEvent ON route.routeId = routeEvent.routeId WHERE route(parcelId)=$1 and routeEvent(currLockerId)=$2;",
+        parcel_id, start_locker_id)["userDoing"]
     ### start_locker, end_locker, current_time
     ### Get the journeys and nodes from the database
     ### journeys = [Journey]

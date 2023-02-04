@@ -59,8 +59,3 @@ function addDropOffBox(xCoord, yCoord, destinationBool){
         radius: 5
     });
 }
-
-
-function addTask(taskDialogue, taskTitle, ) {
-
-}

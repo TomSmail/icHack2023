@@ -161,7 +161,7 @@ async def getUsersRoute():
     start_time = request.get_json()["start_time"]
     end_time = request.get_json()["end_time"]
     journey_points = request.get_json()["journey_points"]
-            
+
     journey_id = await current_app.db.execute("INSERT INTO journey(startTime, endTime, distributorId) VALUES ($1, $2, $3) RETURNING journeyId INTO journeyId;", start_time, end_time, distributor_id)
 
 
@@ -184,6 +184,10 @@ async def getUserInfo():
 async def getLockerLocations():
     return "Hello", 200, {'X-Header': 'Value'}
 
+# GET - username to user id
+@distributorbp.route('/locker/getall', methods = ["GET"])
+async def usernameToUserId():
+    return "Hello", 200, {'X-Header': 'Value'}
 
 # For the backend
 # Determine a parcel's route <- Luke

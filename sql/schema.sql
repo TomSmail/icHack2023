@@ -18,11 +18,11 @@ CREATE TABLE  IF NOT exists parcel(
 
 CREATE TABLE IF NOT exists distributor(
     distributorId SERIAL PRIMARY KEY,
-    balance DECIMAL(10, 2),
+    balance DECIMAL(10, 2) DEFAULT 0,
     username VARCHAR(50),
     pfpUrl VARCHAR(100),
-    failedDeliveries INTEGER,
-    succeededDeliveries INTEGER
+    failedDeliveries INTEGER DEFAULT 0,
+    succeededDeliveries INTEGER DEFAULT 0
     -- also need some way to hit them up via push notifications
 );
 

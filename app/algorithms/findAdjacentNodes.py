@@ -9,7 +9,7 @@
 # returns all edges
 def getArcs(journeys, nodes):
     arcs = []
-    adjNodesDict = getAdjNodesDict
+    adjNodesDict = getAdjNodesDict(journeys, nodes)
     for node in nodes:
         arcs.extend(adjNodesDict[node])
     return arcs

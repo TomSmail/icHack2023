@@ -1,4 +1,28 @@
+from types import coroutine
 import click
+import asyncpg
+import toml
+import asyncio
+
+
+with open('config.toml', 'r') as f:
+    parsed_toml = toml.loads(f.read())
+
+
+async def connect():
+    return await asyncpg.connect(parsed_toml["DB_CONN"])
+
+
+async def write():
+    conn = await connect()
+    with open('sql/schema.sql', 'r') as f:
+        await conn.execute(f.read())
+
+
+async def clear():
+    conn = await connect()
+    with open('sql/drop.sql', 'r') as f:
+        await conn.execute(f.read())
 
 
 @click.group()
@@ -7,12 +31,14 @@ def cli():
 
 
 @cli.command()
-def initdb():
+def init():
+    asyncio.run(write())
     click.echo('Initialized the database')
 
 
 @cli.command()
-def dropdb():
+def drop():
+    asyncio.run(clear())
     click.echo('Dropped the database')
 
 

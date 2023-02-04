@@ -1,1 +1,1 @@
-DB_CONN="postgresql://postgres:password@146.169.248.38/db"
+DB_CONN="postgresql://postgres:password@146.169.241.25/db"

@@ -6,18 +6,15 @@
 #                               to an end point close to end locker 
 #                               (both the points are on the same journey)))
 
+# returns all edges
+def getArcs(journeys, nodes):
+    arcs = []
+    adjNodesDict = getAdjNodesDict
+    for node in nodes:
+        arcs.extend(adjNodesDict[node])
+    return arcs
 
- 
-# input: list of journeys (arcs of and list of nodes (lockers))
-# output: list of startId, endId, startTime and duration
-# def findAdjacentNodes (startId):
-#     nodePointsDict[startId] # list of points close to starting node
-
-#     return [startId, endId, journey.startTime, journey.endTime - journey.startTime]
-
-
-
-# returns adjacent lockers
+# output: dictionary with key node and list of startId, endId, startTime and duration
 def getAdjNodesDict(journeys, nodes):
     pointNodesDict = getAdjNodesDict(journeys, nodes)
     adjNodesDict = {}
@@ -58,34 +55,4 @@ def getPointNodesDict(journeys, nodes):
 
 def nearBy(p1, p2, dist):
     return ((p1.lat - p2.lat) ^ 2 + (p1.long - p2.long) ^ 2) ** 2 <= dist
-
-
-# def getNearestNode(journeys, nodes):
-#     pointNodesDict = {}
-#     adjacentNodes = {}
-#     for journey in journeys:
-#         for startNode in nodes:
-#             if (journey.startLocation == startNode.Location):
-#                 for endNode in nodes:
-#                     if(journey.endLocation == endNode.Location):
-
-
-    # nodePointsDict = {}
-    # for node in nodes:
-    #     nodePoints = []
-    #     for journey in journeys:
-            
-
-    #     nodePointsDict[node] = nodePoints
-    # journey.startTime
-    # journey.endTime
-    # journey.startLoc.lat
-    # journey.startLoc.long
-    # journey.endLoc.lat
-    # journey.endLoc.long
-
-    # node.lat
-    # node.long
-
-    
 

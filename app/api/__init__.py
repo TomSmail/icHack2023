@@ -1,5 +1,8 @@
 from quart import Blueprint, render_template
 from quart import Blueprint, current_app
+from app.algorithms.findAdjacentNodes import *
+from app.algorithms.lockerSearch import Graph, route_parcel
+
 
 apibp = Blueprint('api', __name__, url_prefix="/api")
 producerbp = Blueprint("producer", __name__, url_prefix="/producer")
@@ -80,6 +83,19 @@ async def getParcelStatus():
 @producerbp.route('/locker/estimate', method = ["GET"])
 async def estimatedDeliveryTime():
     # call Luke's algorithm
+
+    ##
+
+    ### start_locker, end_locker, current_time
+    ### Get the journeys and nodes from the database
+
+    g = Graph()
+
+
+
+
+
+
     return "Hello", 200, {'X-Header': 'Value'}
 
 # POST - Add a new locker at a given location

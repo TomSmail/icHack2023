@@ -13,9 +13,40 @@ html {
 }
 
 
+
+
+.container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    justify-content: space-between;
+
+}
+
+.primary {
+    flex-grow: 1;
+    position: relative;
+}
+
 #map {
     height: 100%;
-    width: 100vw;
+    width: 100%;
+    z-index: 0;
+    position: absolute;
+}
+
+.overlay {
+    z-index: 1;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.button {
+    height: 40px;
+    width: 40px;
+    background: black;
 }
 
 #map .leaflet-tile-pane {
@@ -27,18 +58,9 @@ html {
     filter: gray;
 }
 
-.container {
-    z-index: 3;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    display: flex;
-    flex-direction: column;
-}
+.secondary {
+    width: 50%;
 
-.main-container {
-    display: flex;
-    flex-direction: column;
 }
 
 .profile-photo {

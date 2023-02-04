@@ -22,17 +22,23 @@
 </head>
 
 <body>
-    <div class="main-container">
+    <div class="container">
         <div class="primary">
             <div id="map"></div>
 
-            <div class="container">
+            <div class="overlay">
+                <div class="button" onclick="profileButton()">
+                </div>
+
                 <div class="profile-photo" onclick="profileButton()"></div>
             </div>
         </div>
         <!-- this is empty until press profile button -->
         <div class="secondary">
-            <div id="profile"></div>
+            <div id="profile">
+                <p>Hello!</p>
+            </div>
+
         </div>
 
     </div>

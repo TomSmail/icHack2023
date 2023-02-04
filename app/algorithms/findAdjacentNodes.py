@@ -17,7 +17,7 @@ def getArcs(journeys, nodes):
 
 # output: dictionary with key node and list of startId, endId, startTime and duration
 def getAdjNodesDict(journeys, nodes):
-    pointNodesDict = getAdjNodesDict(journeys, nodes)
+    pointNodesDict = getPointNodesDict(journeys, nodes)
     adjNodesDict = {}
     # goes through each journey each person makes
     for journey in journeys:

@@ -12,7 +12,8 @@ def getArcs(journeys, nodes):
     arcs = []
     adjNodesDict = getAdjNodesDict(journeys, nodes)
     for node in nodes:
-        arcs.extend(adjNodesDict[node])
+        if str(node) in adjNodesDict:
+            arcs.extend(adjNodesDict[str(node)])
     return arcs
 
 # output: dictionary with key node and list of startId, endId, startTime and duration
@@ -22,16 +23,16 @@ def getAdjNodesDict(journeys, nodes):
     # goes through each journey each person makes
     for journey in journeys:
         # goes through each locker a person could start at
-        for startNode in pointNodesDict[journey.startLocation]:
+        for startNode in pointNodesDict[str(journey.startLocation)]:
             startNodeAdjNodes = []
             # goes through each locker a person could go to
-            for endNode in pointNodesDict[journey.endLocation]:
+            for endNode in pointNodesDict[str(journey.endLocation)]:
                 # adds the nodes that are adjacent to the start nodes to a list
                 # which is then added to the dictionary later
                 assert type(journey.startTime) == datetime.datetime
 
                 startNodeAdjNodes.append([startNode.id, endNode.id, journey.startTime.time(), journey.endTime - journey.startTime])
-        adjNodesDict[startNode] = startNodeAdjNodes
+        adjNodesDict[str(startNode)] = startNodeAdjNodes
     return adjNodesDict
 
 # returns lockers that person could go to at a drop off / pick up location
@@ -52,8 +53,8 @@ def getPointNodesDict(journeys, nodes):
             if(nearBy(journey.endLocation, node.location, nearByMaxDist)):
                 nodesCloseToJourneyEnd.append(node)
                 
-        pointNodesDict[journey.startLocation] = nodesCloseToJourneyStart
-        pointNodesDict[journey.endLocation] = nodesCloseToJourneyEnd
+        pointNodesDict[str(journey.startLocation)] = nodesCloseToJourneyStart
+        pointNodesDict[str(journey.endLocation)] = nodesCloseToJourneyEnd
     return pointNodesDict
 
 def nearBy(p1, p2, dist):

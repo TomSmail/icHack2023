@@ -24,17 +24,17 @@ INSERT INTO parcel(dateIntoSystem, dateIntoLocker, lockerIn, destinationLocker, 
 INSERT INTO journey ( distributorId) VALUES ( 1);
 INSERT INTO journey ( distributorId) VALUES ( 2);
 
-INSERT INTO journeyPoint(ordinalNumber, arrivalTime, latitude, longitude)
-    VALUES (0, '8:25:00', 51.4996, -0.1771);
-INSERT INTO journeyPoint(ordinalNumber, arrivalTime, latitude, longitude)
-    VALUES (1, '9:14:18', 50.4996, -0.1782);
-INSERT INTO journeyPoint(ordinalNumber, arrivalTime, latitude, longitude)
-    VALUES (2, '10:54:32', 51.5007, -0.1782);
+INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
+    VALUES (0, 1, '8:25:00', 51.4996, -0.1771);
+INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
+    VALUES (1, 1, '9:14:18', 50.4996, -0.1782);
+INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
+    VALUES (2, 1, '10:54:32', 51.5007, -0.1782);
 
-INSERT INTO journeyPoint(ordinalNumber, arrivalTime, latitude, longitude)
-    VALUES (0, '16:57:42', 51.4996, -0.1771);
-INSERT INTO journeyPoint(ordinalNumber, arrivalTime, latitude, longitude)
-    VALUES (1,'18:05:01', 50.4996, -0.1784);
+INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
+    VALUES (0, 2, '16:57:42', 51.4996, -0.1771);
+INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
+    VALUES (1, 2, '18:05:01', 50.4996, -0.1784);
 
 
 

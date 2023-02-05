@@ -33,7 +33,7 @@ class Graph:
 
     def find_best(self, start_id, end_id, start_time):
         # TODO - Fix when to start date, at the moment just 04/01/2023 at 9am
-        self.parents = defaultdict(lambda: (-1,-1,-1,-1))
+        self.parents = defaultdict(lambda: (-1,-1,-1,-1,-1,-1))
         #START_DATE = datetime.datetime(2023, 1,4,9)
         MAX_YEAR = datetime.datetime(year=9999, month=1, day=1)
         best = defaultdict(lambda: MAX_YEAR)
@@ -70,7 +70,7 @@ class Graph:
 
 
                 if earliest_arrival < best[edge.end_id]:
-                    self.parents[edge.end_id] = (next_node, earliest_arrival, next_time, edge.userResponsible)
+                    self.parents[edge.end_id] = (next_node, earliest_arrival, next_time, edge.userResponsible, edge.start_location, edge.end_location)
                     best[edge.end_id] = earliest_arrival
                     hp.heappush(prioq, (earliest_arrival, edge.end_id))
 
@@ -82,10 +82,10 @@ class Graph:
         route = []
         while end_id != start_id and end_id != -1:
             print(end_id, start_id)
-            next_node, arr_time, dep_time, user = self.parents[end_id]
+            next_node, arr_time, dep_time, user, startLoc, endLoc = self.parents[end_id]
             if next_node == -1:
                 break
-            route.append((next_node, end_id, dep_time, arr_time, user))
+            route.append((next_node, end_id, dep_time, arr_time, user, startLoc, endLoc))
             end_id = next_node
 
         route = list(reversed(route))

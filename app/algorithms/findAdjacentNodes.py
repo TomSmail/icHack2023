@@ -11,6 +11,8 @@ import datetime
 def getArcs(journeys, nodes):
     arcs = []
     adjNodesDict = getAdjNodesDict(journeys, nodes)
+    print("dictionaiauguiasgfuisaheifoa")
+    print(adjNodesDict)
     for node in nodes:
         if str(node) in adjNodesDict:
             arcs.extend(adjNodesDict[str(node)])
@@ -75,6 +77,8 @@ import dataclasses
 class Point:
     lat: float
     long: float
+    id: int
+  
 
 @dataclasses.dataclass
 class Node:
@@ -91,8 +95,8 @@ class Journey:
 
 
 if __name__ == "__main__":
-    t1 = Point(52.1951, 0.1313)
-    t2 = Point(51.5072, 0.1276)
+    t1 = Point(52.1951, 0.1313, None)
+    t2 = Point(51.5072, 0.1276, None)
 
 
 

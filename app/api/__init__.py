@@ -96,19 +96,19 @@ async def dbBuildGraph():
     today = datetime.today()
 
     for journey in journeyRows:
-        journeyPoints = await current_app.db.fetch("SELECT (arrivalTime, latitude, longitude) FROM journeyPoint WHERE journeyId = $1 ORDER BY ordinalNumber;", journey["row"][0])
+        journeyPoints = await current_app.db.fetch("SELECT (arrivalTime, latitude, longitude, journeyPointId) FROM journeyPoint WHERE journeyId = $1 ORDER BY ordinalNumber;", journey["row"][0])
         for i,pt in enumerate(journeyPoints[:-1]):
             journeySegments.append(Journey(
                 datetime.combine(today, pt["row"][0]), datetime.combine(today,journeyPoints[i+1]["row"][0]), 
-                Point(pt["row"][1], pt["row"][2]),
-                Point(journeyPoints[i+1]["row"][1], journeyPoints[i+1]["row"][2]),
+                Point(pt["row"][1], pt["row"][2], pt["row"][3]),
+                Point(journeyPoints[i+1]["row"][1], journeyPoints[i+1]["row"][2], pt["row"][3]),
                 journey["row"][1]
             ))
 
     lockerRows = await current_app.db.fetch("SELECT (latitude, longitude, lockerId) FROM locker;")
     nodes = []
     for row in lockerRows:
-        nodes.append(Node(Point(row["row"][0], row["row"][1]), row["row"][2]))
+        nodes.append(Node(Point(row["row"][0], row["row"][1], None), row["row"][2]))
         
     g = Graph()
 
@@ -160,7 +160,7 @@ async def createNewParcel():
     print("hoppp")
     print(path)
     for (start_id, end_id, dep_time, arr_time, user_id, journeyPointStartId, journeyPointEndId) in path:
-        await current_app.db.execute("INSERT INTO routeEvent (leaveTime, arrivalTime, currLockerId, nextLockerId, routeId, parcelId, userDoing, journeyPointStartId, journeyPointEndId) VALUES ($1, $2, $3, $4, $5, $6, $7)", dep_time, arr_time, start_id, end_id, route_id, parcel_id, user_id, journeyPointStartId, journeyPointEndId)
+        await current_app.db.execute("INSERT INTO routeEvent (leaveTime, arrivalTime, currLockerId, nextLockerId, routeId, parcelId, userDoing, journeyPointStartId, journeyPointEndId) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)", dep_time, arr_time, start_id, end_id, route_id, parcel_id, user_id, journeyPointStartId.id, journeyPointEndId.id)
 
     return "{'deliveryTime': '" + best.strftime("%d/%m/%Y, %H:%M:")+"'}", 200
 

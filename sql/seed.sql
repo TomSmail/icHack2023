@@ -12,8 +12,8 @@ INSERT INTO distributor ( balance, username, pfpUrl, failedDeliveries, succeeded
     VALUES ( 31.43, 'mbuble', 'https://upload.wikimedia.org/wikipedia/commons/f/f9/MichaelBubleSmileeb2011.jpg', 0, 300);
 
 -- in delivery
-INSERT INTO parcel(dateIntoSystem, dateIntoLocker, lockerIn, destinationLocker, inTransit)
-   VALUES ('2023-02-05 11:23:44', '2023-02-06 1:52:31', 1, 7, false);
+-- INSERT INTO parcel(dateIntoSystem, dateIntoLocker, lockerIn, destinationLocker, inTransit)
+--    VALUES ('2023-02-05 11:23:44', '2023-02-06 1:52:31', 1, 7, false);
 -- delivered
 --INSERT INTO parcel(parcelId, dateIntoSystem, dateIntoLocker, lockerIn, destinationLocker, inTransit)
 --    VALUES (1, '2023-02-03 9:12:00', '2023-02-03 18:41:59', 6, 1, false)
@@ -41,8 +41,8 @@ INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longit
 
 --INSERT INTO route (routeId, parcelId)
 --    VALUES (0, 0)
-INSERT INTO route (parcelId) VALUES (1);
+-- INSERT INTO route (parcelId) VALUES (1);
 
 -- Garbage
-INSERT INTO routeEvent (leaveTime, arrivalTime, nextLockerId, currLockerId, routeId, parcelId, userDoing, journeyPointStartId, journeyPointEndId)
-   VALUES ('2023-02-05 11:23:44', '2023-02-05 11:23:46', 7, 1, 1, 1,  2, 4, 5);
+-- INSERT INTO routeEvent (leaveTime, arrivalTime, nextLockerId, currLockerId, routeId, parcelId, userDoing, journeyPointStartId, journeyPointEndId)
+--    VALUES ('2023-02-05 11:23:44', '2023-02-05 11:23:46', 7, 1, 1, 1,  2, 4, 5);

@@ -186,6 +186,11 @@ function toggleVis() {
             // Examine the text in the response
             response.json().then(function (data) {
                 console.log(data);
+                for (let i = 0; i < data["lockers"].length, i++;) {
+                    var xCoord = data["lockers"][i].lattitude;
+                    var yCoord = data["lockers"][i].longitude;
+                    L.marker([xCoord, yCoord]).addTo(map);
+                }
             });
         })
     .catch(err => console.log('Fetch Error :-S', err));

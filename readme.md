@@ -8,7 +8,7 @@ Yet, in London alone, over two million commutes take place every day. What if we
 
 To achieve this ambition, we present GreenShip, a Progressive Web App to engage everyday commuters in efficient delivery, through monetary incentive. We provide a modular system which can integrate with existing locker infrastructure (e.g. Amazon Lockers) to enable parcel tracking, route planning (using daily travel routes), and courier recompensation. The product is configured to provide accurate estimates of delivery time which can be offered to retailers through an API interface. 
 
-The routing is performed with a proprietary DP algorithm operating on a directed graph, proceeding from the goal location back towards the start locker, calculating the optimal end-time from this node, with the result being cached in a normalised PostgreSQL database.
+The routing is performed with a proprietary DP algorithm operating on a directed graph, proceeding from the goal location back towards the start locker, calculating the optimal end-time from this node, with the result being cached in a normalised PostgreSQL database, and presented to users through an integrated Leaflet.js map.
 
 A challenge faced during the project was in developing a sufficiently efficient yet (close to) optimal algorithm for the task. Several iterations were devised, involving heuristics, pruning and standard algorithms.
 

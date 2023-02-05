@@ -1,4 +1,4 @@
-from quart import Blueprint, request, send_file, current_app
+from quart import Blueprint, make_response, redirect, request, send_file, current_app, url_for
 
 webbp = Blueprint('web', __name__, static_folder='./static',
                   static_url_path="")
@@ -11,16 +11,27 @@ async def index():
 
 @webbp.route('/register')
 async def rerg():
-    return await webbp.send_static_file("register.html")
+    if request.method == "GET":
+        return await webbp.send_static_file("register.html")
+    elif request.method == "POST":
+        username = request.form['username']
+        pw = request.form['psw']  # lmao
 
 
 @webbp.route('/login', methods=["GET", "POST"])
 async def logine():
     if request.method == "GET":
         return await webbp.send_static_file("login.html")
-    else:
-        username = request.form['username']
-        pw = request.form['psw']  # lmao
+    elif request.method == "POST":
+        fm = await request.form
+        username = fm['username']
+        pw = fm['psw']  # lmao
         row = await current_app.db.fetchrow(
             'SELECT distributorId FROM distributor WHERE username = $1', username)
         print(row)
+        if row == None:
+            resp = await make_response(redirect(url_for("web.rerg")))
+            return resp
+        resp = await make_response(redirect(url_for("web.index")))
+        resp.set_cookie('userid', str(row["distributorid"]))
+        return resp

@@ -1,7 +1,13 @@
-window.onload = buildDummy();
+window.onload = getprofiledata();
 
-function buildDummy() {
+function getprofiledata() {
     profileButton("Bob Ross", "420.69", "./bobross.jpeg")
+    if (document.cookie.indexOf("userid=") < 0) {
+
+        window.location.href = "/login";
+
+    }
+
 }
 
 function profileButton(name, balance, profilePicUrl) {

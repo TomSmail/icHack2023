@@ -1,3 +1,19 @@
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/serviceworker.js')
+      .then(function(registration) {
+        // Registration was successful
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      }).catch(function(err) {
+        // registration failed :(
+        console.log('ServiceWorker registration failed: ', err);
+      });
+  }
+
+
+
+
+
+
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(cacheName).then(cache => {
@@ -24,7 +40,4 @@ const assets = [
     '/icons/icon-192.png'
 
 ];
-
-
-
 

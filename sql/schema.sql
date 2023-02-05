@@ -43,9 +43,7 @@ create table IF NOT exists journeyPoint(
 
 CREATE TABLE route(
     routeId SERIAL primary key,
-    userDoing INTEGER,
     parcelId INTEGER,
-    FOREIGN KEY (userDoing) REFERENCES distributor(distributorId)   
 );
 
 CREATE TABLE routeEvent(
@@ -55,9 +53,11 @@ CREATE TABLE routeEvent(
     currLockerId INTEGER,
     routeId INTEGER,
     parcelId INTEGER,
+    userDoing INTEGER,
     FOREIGN KEY (parcelId) REFERENCES parcel(parcelId),
     FOREIGN KEY (nextLockerId) REFERENCES locker(lockerId),
     FOREIGN KEY (currLockerId) REFERENCES locker(lockerId),	
     FOREIGN KEY (routeId) REFERENCES route(routeId)
+    FOREIGN KEY (userDoing) REFERENCES distributor(distributorId)   
 );
 	

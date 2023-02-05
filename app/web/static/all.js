@@ -196,28 +196,28 @@ function flip() {
 
 function toggleVis() {
     fetch('api/distributor/locker/getall')
-    .then(
-        response => {
-            if (response.status !== 200) {
-                console.log('ERRNO: ' + response.status);
-                if (response.status == 500) {
-                    //document.location.href = "/login"
+        .then(
+            response => {
+                if (response.status !== 200) {
+                    console.log('ERRNO: ' + response.status);
+                    if (response.status == 500) {
+                        //document.location.href = "/login"
+                    }
+                    return;
                 }
-                return;
-            }
-            
-            // Examine the text in the response
-            response.json().then(function (data) {
-                console.log(data);
-                for (let i = 0; i < data["lockers"].length, i++;) {
-                    var xCoord = data["lockers"][i].lattitude;
-                    var yCoord = data["lockers"][i].longitude;
-                    L.marker([xCoord, yCoord]).addTo(map);
-                }
-            });
-        })
-    .catch(err => console.log('Fetch Error :-S', err));
-    
+
+                // Examine the text in the response
+                response.json().then(function (data) {
+                    console.log(data["lockers"]);
+                    for (let i = 0; i < data["lockers"].length, i += 1;) {
+                        var xCoord = data["lockers"][i]["latitude"];
+                        var yCoord = data["lockers"][i]["longitude"];
+                        L.marker([xCoord, yCoord]).addTo(map);
+                    }
+                });
+            })
+        .catch(err => console.log('Fetch Error :-S', err));
+
 }
 
 

@@ -132,8 +132,8 @@ async def dbBuildGraph():
 # GET - estimated delivery time from a given start locker
 @producerbp.route('/locker/estimate', methods = ["GET"])
 async def estimatedDeliveryTime():
-    start_locker_id = request.args.get()["start_locker"]
-    end_locker_id = request.args.get()["end_locker"]
+    start_locker_id = request.args.get("start_locker")
+    end_locker_id = request.args.get("end_locker")
     current_time = datetime.now()
 
     g = dbBuildGraph()

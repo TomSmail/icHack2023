@@ -4,8 +4,8 @@ const api_url ="http://127.0.0.1:2025/";
 
 async function buy() {
     const data = {
-         "start_locker": 6,
-         "end_locker": 7  
+         "start_locker": 1,
+         "end_locker": 5 
     } 
     
     const response = await fetch(api_url + "api/producer/parcel/create", {
@@ -32,8 +32,8 @@ async function getapi(url) {
     
     // Storing response
     const response = await fetch(url + 'api/producer/locker/estimate?' + new URLSearchParams({
-        start_locker: 6,
-        end_locker: 7,
+        start_locker: 1,
+        end_locker: 5,
     }));
     
     // Storing data in form of JSON

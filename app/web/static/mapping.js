@@ -6,8 +6,6 @@ var backEndUrl = "";
 // adds tile layers
 //getDropOffBoxes(map);
 
-
-
 // GET requesets
 async function getDropOffBoxes(map) {
     const response = await fetch(backEndUrl + '/locker/getall');
@@ -22,7 +20,7 @@ async function getDropOffBoxes(map) {
 
 async function getUserNameAndPFP() {
     const response = await fetch(backEndUrl + '/user/info');
-    return [response.json().balance, response.json().pfpUrl]
+    return response.json;
 }
 // // async function createNewUser(userName, pfpUrl) {
 //     const response = await fetch(backEndUrl + '/user/create');
@@ -57,8 +55,8 @@ function buildLocations(circleData, pointData, map) {
 }
 
 function buildDummy(map) {
-    var circleData = [[51.53, -0.092, true, 500], [51.54, -0.091, false, 500]]
-    var pointData = [[51.53, -0.092, true, "Post Box"], [51.54, -0.091, false, "Drop Point"]]
+    var circleData = [[51.53, -0.092, true, 500], [51.54, -0.009, false, 500]]
+    var pointData = [[51.532, -0.0924, true, "Post Box"], [51.54, -0.006, false, "Drop Point"]]
     buildLocations(circleData, pointData, map);
 }
 

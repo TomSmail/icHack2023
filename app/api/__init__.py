@@ -222,13 +222,13 @@ async def getRoutePart():
 
 
 
-@distributorbp.route('/user/get_routes', methods=["GET"])
+@distributorbp.route('/user/get_route_parts', methods=["GET"])
 async def getUserRoutes():
     user_id = int(request.cookies.get("userid"))
 
     rowsReturned = await current_app.db.fetch("SELECT * FROM routeEvent WHERE userDoing=$1;", user_id)
 
-    result = {"routes": [*map(lambda x : x["routeid"], rowsReturned)]}
+    result = {"routes": [*map(lambda x : x["routeeventid"], rowsReturned)]}
     return dumps(result), 200
 
 

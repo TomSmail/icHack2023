@@ -45,7 +45,7 @@ def clean():
 
 
 @cli.command()
-def drop():
+def seed():
     asyncio.run(seed())
     click.echo('seed ')
 

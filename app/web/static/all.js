@@ -194,6 +194,27 @@ function flip() {
 
 }
 
+function toggleVis() {
+    fetch('api/distributor/locker/getall')
+    .then(
+        response => {
+            if (response.status !== 200) {
+                console.log('ERRNO: ' + response.status);
+                if (response.status == 500) {
+                    //document.location.href = "/login"
+                }
+                return;
+            }
+            
+            // Examine the text in the response
+            response.json().then(function (data) {
+                console.log(data);
+            });
+        })
+    .catch(err => console.log('Fetch Error :-S', err));
+    
+}
+
 
 
 window.addEventListener("load", () => {

@@ -70,6 +70,7 @@ html {
 .profile {
     display: flex;
     flex-direction: row;
+    padding-bottom: 20px;
 }
 
 
@@ -81,4 +82,18 @@ html {
 .profileinfo {
     padding-left: 10px;
     flex-grow: 1;
+}
+
+
+
+/* route stuff */
+
+
+.route {
+    padding: 20px;
+    cursor: pointer;
+}
+
+.route:hover {
+    background: rgba(183, 183, 183, 0.5);
 }

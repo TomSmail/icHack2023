@@ -25,7 +25,7 @@ async def clear():
         await conn.execute(f.read())
 
 
-async def seed():
+async def writeseed():
     conn = await connect()
     with open('sql/seed.sql', 'r') as f:
         await conn.execute(f.read())
@@ -46,7 +46,7 @@ def reset():
 
 @cli.command()
 def seed():
-    asyncio.run(seed())
+    asyncio.run(writeseed())
     click.echo('seed ')
 
 

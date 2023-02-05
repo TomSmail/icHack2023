@@ -21,5 +21,6 @@ async def logine():
     else:
         username = request.form['username']
         pw = request.form['psw']  # lmao
-        current_app.db.fetchrow(
+        row = await current_app.db.fetchrow(
             'SELECT distributorId FROM distributor WHERE username = $1', username)
+        print(row)

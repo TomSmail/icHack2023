@@ -100,12 +100,12 @@ INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longit
 
 INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
    VALUES (0, 2, '17:14:18', 51.4996, -0.1782);
+--INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
+--   VALUES (1, 2, '17:54:32', 51.2006, -0.1622);
+--INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
+--   VALUES (0, 3, '17:58:32', 51.2006, -0.1624);
 INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
-   VALUES (1, 2, '17:54:32', 51.2006, -0.1619);
-INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
-   VALUES (0, 3, '17:58:32', 51.2006, -0.1624);
-INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
-   VALUES (1, 3, '18:22:25', 51.5010, -0.1246);
+   VALUES (1, 2, '18:22:25', 51.5010, -0.1246);
 
 -- INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
 --    VALUES (0, 2, '16:57:42', 51.4999, -0.1781);

@@ -33,7 +33,8 @@ CREATE TABLE IF NOT exists journey(
 );
 
 create table IF NOT exists journeyPoint(
-    ordinalNumber SERIAL,
+    journeyPointId SERIAL PRIMARY KEY,
+    ordinalNumber INTEGER,
     journeyId INTEGER, 
     arrivalTime TIME,
     latitude real,
@@ -54,11 +55,15 @@ CREATE TABLE routeEvent(
     routeId INTEGER,
     parcelId INTEGER,
     userDoing INTEGER,
-    routeEventId INTEGER,
+    journeyPointStartId INTEGER,
+    journeyPointEndId INTEGER, 
+    routeEventId SERIAL PRIMARY KEY,
     FOREIGN KEY (parcelId) REFERENCES parcel(parcelId),
     FOREIGN KEY (nextLockerId) REFERENCES locker(lockerId),
     FOREIGN KEY (currLockerId) REFERENCES locker(lockerId),	
     FOREIGN KEY (routeId) REFERENCES route(routeId),
-    FOREIGN KEY (userDoing) REFERENCES distributor(distributorId)   
+    FOREIGN KEY (userDoing) REFERENCES distributor(distributorId),
+    FOREIGN KEY (journeyPointStartId) REFERENCES journeyPoint(journeyPointId),
+    FOREIGN KEY (journeyPointEndId) REFERENCES journeyPoint(journeyPointId)
 );
 	

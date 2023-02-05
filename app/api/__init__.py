@@ -70,28 +70,6 @@ async def placeParcelOnArrival():
 
     return "{'status': 'Success'}", 200
 
-# POST - Add a new parcel into the system
-
-
-@producerbp.route('/parcel/create', methods=["POST"])
-async def createNewParcel():
-    # Create a new parcel row with the data as provided by the user.
-
-    start_locker_id = (await request.get_json())["start_locker"]
-    end_locker_id = (await request.get_json())["end_locker"]
-    current_time = datetime.now()
-
-    g = dbBuildGraph()
-    best, path = route_parcel(start_locker_id, end_locker_id, current_time, g)
-
-    parcel_id = await current_app.db.execute("INSERT INTO parcel (dateIntoSystem, dateIntoLocker, lockerIn, destinationLocker, inTransit) VALUES ($1, $2, $3, $4, $5) RETURNING parcelId AS parcelId", current_time, current_time, start_locker_id, end_locker_id, False)
-    route_id = await current_app.db.execute("INSERT INTO route (userDoing, lockerIn, destinationLocker, inTransit) VALUES ($1, $2, $3, $4, $5) RETURNING routeId INTO routeId", current_time, current_time, start_locker_id, end_locker_id, False)
-
-    for (start_id, end_id, dep_time, arr_time, user_id) in path:
-        await current_app.db.execute("INSERT INTO routeEvent (leaveTime, arrivalTime, currLockerId, nextLockerId, routeId, parcelId, userDoing) VALUES ($1, $2, $3, $4, $5, $6, $7)", dep_time, arr_time, start_id, end_id, route_id, parcel_id, user_id)
-
-    return "{'deliveryTime': '" + best.strftime("%d/%m/%Y, %H:%M:")+"'}", 200
-
 # GET - Get status of a given parcel
 
 
@@ -115,12 +93,13 @@ async def getParcelStatus():
 async def dbBuildGraph():
     journeyRows = await current_app.db.fetch("SELECT (journeyId, distributorId) FROM journey;")
     journeySegments = []
+    today = datetime.today()
+
     for journey in journeyRows:
         journeyPoints = await current_app.db.fetch("SELECT (arrivalTime, latitude, longitude) FROM journeyPoint WHERE journeyId = $1 ORDER BY ordinalNumber;", journey["row"][0])
         for i,pt in enumerate(journeyPoints[:-1]):
-            print(journeyPoints)
             journeySegments.append(Journey(
-                pt["row"][0], journeyPoints[i+1]["row"][0], 
+                datetime.combine(today, pt["row"][0]), datetime.combine(today,journeyPoints[i+1]["row"][0]), 
                 Point(pt["row"][1], pt["row"][2]),
                 Point(journeyPoints[i+1]["row"][1], journeyPoints[i+1]["row"][2]),
                 journey["row"][1]
@@ -156,23 +135,72 @@ async def createLocker():
     return "{'status': 'Success'}", 200
 
 
+
+
+# POST - Add a new parcel into the system
+
+
+@producerbp.route('/parcel/create', methods=["POST"])
+async def createNewParcel():
+    # Create a new parcel row with the data as provided by the user.
+
+    start_locker_id = (await request.get_json())["start_locker"]
+    end_locker_id = (await request.get_json())["end_locker"]
+    current_time = datetime.now()
+
+    g = await dbBuildGraph()
+    print("hop edges")
+    print(g.edges)
+
+    best, path = route_parcel(start_locker_id, end_locker_id, current_time, g)
+
+    parcel_id = await current_app.db.fetchval("INSERT INTO parcel (dateIntoSystem, dateIntoLocker, lockerIn, destinationLocker, inTransit) VALUES ($1, $2, $3, $4, $5) RETURNING parcelId", current_time, current_time, start_locker_id, end_locker_id, False)
+    route_id = await current_app.db.fetchval("INSERT INTO route (parcelId) VALUES ($1) RETURNING routeId", parcel_id)
+
+    print("hoppp")
+    print(path)
+    for (start_id, end_id, dep_time, arr_time, user_id, journeyPointStartId, journeyPointEndId) in path:
+        await current_app.db.execute("INSERT INTO routeEvent (leaveTime, arrivalTime, currLockerId, nextLockerId, routeId, parcelId, userDoing, journeyPointStartId, journeyPointEndId) VALUES ($1, $2, $3, $4, $5, $6, $7)", dep_time, arr_time, start_id, end_id, route_id, parcel_id, user_id, journeyPointStartId, journeyPointEndId)
+
+    return "{'deliveryTime': '" + best.strftime("%d/%m/%Y, %H:%M:")+"'}", 200
+
+
+
 # For Distribution Front End
 
 # GET - user's journey and start and end locker locations, and like a way of identifying the parcel.
 # provide route event id
 @distributorbp.route('/route_part/get', methods=["GET"])
-async def getUsersRoute():
+async def getRoutePart():
 
-    route_part_id = request.args.get("route_part_id")
+    route_part_id = int(request.args.get("route_part_id"))
+    print(route_part_id)
+    rowReturned = await current_app.db.fetchrow("SELECT (currLockerId, nextLockerId, parcelId, journeyPointStartId, journeyPointEndId) FROM routeEvent WHERE routeEventId = $1;", route_part_id)
+    print(rowReturned)
 
-    rowReturned = await current_app.db.fetchrow("SELECT (currLockerId, nextLockerId, parcelId) FROM routeEvent WHERE routeEventId = $1;", route_part_id)
-
+# RETURN COORDS.
     result = {
-        "startLockerId": rowReturned["currLockerId"],
-        "endLockerId": rowReturned["nextLockerId"],
-        "parcelId": rowReturned["parcelId"]
+        "startLocker": rowReturned["row"][0],
+        "endLocker": rowReturned["row"][1],
+        "parcelId": rowReturned["row"][2],
+        "startPos": rowReturned["row"][3],
+        "endPos": rowReturned["row"][4]
     }
     return dumps(result), 200
+
+
+
+@distributorbp.route('/user/get_routes', methods=["GET"])
+async def getUserRoutes():
+    user_id = int(request.cookies.get("userid"))
+
+    rowsReturned = await current_app.db.fetch("SELECT * FROM routeEvent WHERE userDoing=$1;", user_id)
+
+    result = {"routes": [*map(lambda x : x["routeid"], rowsReturned)]}
+    return dumps(result), 200
+
+
+
 
 # GET - estimated delivery time from a given start locker
 @producerbp.route('/locker/estimate', methods = ["GET"])
@@ -220,8 +248,7 @@ async def addNewJourney():
 @distributorbp.route('/user/info', methods=["GET"])
 async def getUserInfo():
     # user_id = int(request.args.get("user_id"))
-    user_id = int(request.cookies.get("userid"))
-
+ 
     rowReturned = await current_app.db.fetchrow("SELECT (balance, username, pfpUrl, failedDeliveries, succeededDeliveries) FROM distributor WHERE distributorId=$1;", user_id)
     print(rowReturned)
     result = {

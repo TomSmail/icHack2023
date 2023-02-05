@@ -13,7 +13,7 @@ INSERT INTO distributor ( balance, username, pfpUrl, failedDeliveries, succeeded
 
 -- in delivery
 INSERT INTO parcel(dateIntoSystem, dateIntoLocker, lockerIn, destinationLocker, inTransit)
-   VALUES ('2023-02-05 11:23:44', '2023-02-06 1:52:31', 1, 5, true);
+   VALUES ('2023-02-05 11:23:44', '2023-02-06 1:52:31', 1, 7, false);
 -- delivered
 --INSERT INTO parcel(parcelId, dateIntoSystem, dateIntoLocker, lockerIn, destinationLocker, inTransit)
 --    VALUES (1, '2023-02-03 9:12:00', '2023-02-03 18:41:59', 6, 1, false)
@@ -32,17 +32,17 @@ INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longit
     VALUES (2, 1, '10:54:32', 51.5007, -0.1782);
 
 INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
-    VALUES (0, 2, '16:57:42', 51.4996, -0.1771);
+    VALUES (0, 2, '16:57:42', 51.4999, -0.1781);
 INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
-    VALUES (1, 2, '18:05:01', 50.4996, -0.1784);
+    VALUES (1, 2, '18:05:01', 51.5007, -0.1246);
 
 
 
 
 --INSERT INTO route (routeId, parcelId)
 --    VALUES (0, 0)
---INSERT INTO route (routeId, parcelId)
---    VALUES (1, 1)
---
---INSERT INTO routeEvent (leaveTime, arrivalTime, nextLockerId, currLockerId, routeId, parcelId, userDoing)
---    VALUES ()
+INSERT INTO route (parcelId) VALUES (1);
+
+-- Garbage
+INSERT INTO routeEvent (leaveTime, arrivalTime, nextLockerId, currLockerId, routeId, parcelId, userDoing, journeyPointStartId, journeyPointEndId)
+   VALUES ('2023-02-05 11:23:44', '2023-02-05 11:23:46', 7, 1, 1, 1,  2, 4, 5);

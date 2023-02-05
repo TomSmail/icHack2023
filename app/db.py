@@ -28,8 +28,8 @@ class Database:
         print(await self._db.fetchrow("SELECT * FROM pg_stat_activity"))
         print("connected!")
 
-    def _after_srv(self):
-        self._db.close()
+    async def _after_srv(self):
+        await self._db.close()
         print("db closed")
 
     def __getattr__(self, name: str) -> Any:

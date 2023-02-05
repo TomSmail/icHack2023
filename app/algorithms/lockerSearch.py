@@ -2,6 +2,7 @@ import dataclasses
 import datetime
 from collections import defaultdict
 import heapq as hp
+from .findAdjacentNodes import Point
 
 @dataclasses.dataclass
 class Edge:
@@ -10,8 +11,9 @@ class Edge:
     start_time : datetime.time
     duration: datetime.timedelta
     userResponsible: int
+    start_location: Point
+    end_location: Point
 
-### Arc is a (start_id, end_id, stime, duration)
 class Graph:
 
     MAX_DAYS = 99999999
@@ -19,12 +21,13 @@ class Graph:
         self.edges = defaultdict(list)
         self.parents = defaultdict(lambda: (-1,-1,-1,-1))
 
-    def add_edge(self, u, v, start_dt : datetime.time, duration, userResponsible : int):
-        self.edges[u].append(Edge(v, start_dt, duration, userResponsible))
+    def add_edge(self, u, v, start_dt : datetime.time, duration, userResponsible : int, startLocation: Point, endLocation: Point):
+        self.edges[u].append(Edge(v, start_dt, duration, userResponsible, startLocation, endLocation))
 
     def build_graph(self, arcs):
 
         for arc in arcs:
+            print(arc)
             self.add_edge(*arc)
 
 

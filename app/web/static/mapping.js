@@ -18,7 +18,7 @@ function buildMap() {
 
 // GET requesets
 async function getDropOffBoxes(map) {
-    const response = await fetch(backEndUrl + '/user/create');
+    const response = await fetch(backEndUrl + '/locker/getall');
     const listOfDropboxes = await response.json();
     var pointList = [];
     for (let i = 0; i < listOfDropboxes.length; i++) {
@@ -27,6 +27,13 @@ async function getDropOffBoxes(map) {
     }
     buildLocations(pointList, [], map);
 }
+
+async function createNewUser(userName, pfpUrl) {
+    const response = await fetch(backEndUrl + '/user/create');
+
+}
+
+
 
 function buildLocations(circleData, pointData, map) {
     for (let i = 0; i < circleData.length; i++) {

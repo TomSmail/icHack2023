@@ -77,6 +77,7 @@ class Journey:
     endTime: datetime.datetime
     startLocation: Point
     endLocation: Point
+    userResponsibleId: int
 
 
 

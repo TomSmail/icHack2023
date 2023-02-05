@@ -1,11 +1,11 @@
 from quart import Blueprint, request
 from quart import Blueprint, current_app
 from app.algorithms.findAdjacentNodes import *
-from app.algorithms.lockerSearch import Graph
+from app.algorithms.lockerSearch import Graph, route_parcel
 from random import random
 from asyncio import gather
 from json import dumps
-
+from datetime import datetime
 
 apibp = Blueprint('api', __name__, url_prefix="/api")
 producerbp = Blueprint("producer", __name__, url_prefix="/producer")
@@ -50,7 +50,10 @@ async def placeParcelOnArrival():
     locker_id = request.get_json()["locker_id"]
     user_id = current_app.db.fetchrow("SELECT userDoing FROM route JOIN routeEvent ON route.routeId = routeEvent.routeId WHERE route(parcelId)=$1 and routeEvent(nextLockerId)=$2;", parcel_id, locker_id)["userDoing"]
     final_dest = current_app.db.fetchrow("SELECT destinationLocker FROM parcel WHERE parcelId=$1", parcel_id)["destinationLocker"]
-    gather(user_id, final_dest)
+    current_time = datetime.now()
+    await gather(user_id, final_dest)
+
+    await current_app.db.execute("UPDATE parcel SET dateIntoLocker = $1, lockerIn = $2 WHERE parcelId=$3;", current_time, locker_id, parcel_id)
 
     delivery_prize = random()
     await current_app.db.execute("UPDATE distributor SET balance = balance + $1, succeededDeliveries = succeededDeliveries + 1 WHERE distributorId=$2;", delivery_prize, user_id)
@@ -64,7 +67,22 @@ async def placeParcelOnArrival():
 @producerbp.route('/parcel/create', method = ["POST"])
 async def createNewParcel():
     # Create a new parcel row with the data as provided by the user.
-    return "Hello", 200, {'X-Header': 'Value'}
+
+    start_locker_id = request.get()["start_locker"]
+    end_locker_id = request.get()["end_locker"]
+    current_time = datetime.now()
+
+    g = dbBuildGraph()
+    best, path = route_parcel(start_locker_id, end_locker_id, current_time, g)
+
+    await current_app.db.execute("INSERT INTO parcel (dateIntoSystem, dateIntoLocker, lockerIn, destinationLocker, inTransit) VALUES ($1, $2, $3, $4, $5)", current_time, current_time, start_locker_id, end_locker_id, False)
+    await current_app.db.execute("INSERT INTO route (userDoing, , lockerIn, destinationLocker, inTransit) VALUES ($1, $2, $3, $4, $5)", current_time, current_time, start_locker_id, end_locker_id, False)
+
+    for step in path:
+
+    (start_id, end_id, dep_time, arr_time)
+
+    return "{'deliveryTime': '" + best.strftime("%d/%m/%Y, %H:%M:")+"'}", 200
 
 # GET - Get status of a given parcel
 @producerbp.route('/parcel/status', methods = ["GET"])
@@ -83,31 +101,43 @@ async def getParcelStatus():
     
     return dumps(response), 200
 
-# GET - estimated delivery time from a given start locker
-@producerbp.route('/locker/estimate', method = ["GET"])
-async def estimatedDeliveryTime():
-    # call Luke's algorithm
 
-    ##
-    journeys = await current_app.db.execute("SELECT startTime endTime FROM journey")
-    user_id = awaitcurrent_app.db.fetchrow(
-        "SELECT userDoing FROM route JOIN routeEvent ON route.routeId = routeEvent.routeId WHERE route(parcelId)=$1 and routeEvent(currLockerId)=$2;",
-        parcel_id, start_locker_id)["userDoing"]
-    ### start_locker, end_locker, current_time
-    ### Get the journeys and nodes from the database
-    ### journeys = [Journey]
-    ### nodes = [Nodes]
-
+async def dbBuildGraph():
+    journeyRows = await current_app.db.fetch("SELECT (journeyId, distributorId) FROM journey;")
+    journeySegments = []
+    for journey in journeyRows:
+        journeyPoints = await current_app.db.fetch("SELECT (arrivalTime, latitude, longitude) FROM journeyPoint WHERE journeyId = $1 ORDER BY ordinalNumber;", journey["journeyId"])
+        for i,pt in enumerate(journeyPoints[:-1]):
+            journeySegments.append(Journey(
+                pt["arrivalTime"], journeyPoints[i+1]["arrivalTime"], 
+                Point(pt["latitude"], pt["longitude"]),
+                Point(journeyPoints[i+1]["latitude"], journeyPoints[i+1]["longitude"]),
+                journey["distributorId"]
+            ))
+    
+    lockerRows = await current_app.db.fetchrow("SELECT (latitude, longitude, lockerId) FROM locker;")
+    nodes = []
+    for row in lockerRows:
+        nodes.append(Node(Point(row["latitude"], row["longitude"]), row["lockerId"]))
+        
     g = Graph()
 
-    arcs = getArcs(journeys, nodes)
+    arcs = getArcs(journeySegments, nodes)
 
     g.build_graph(arcs)
 
-    best = g.find_best(start_locker, end_locker)
+    return g
 
+# GET - estimated delivery time from a given start locker
+@producerbp.route('/locker/estimate', method = ["GET"])
+async def estimatedDeliveryTime():
+    start_locker_id = request.get()["start_locker"]
+    end_locker_id = request.get()["end_locker"]
+    current_time = datetime.now()
 
-    #{"deliveryTime" :""}
+    g = dbBuildGraph()
+    best, path = route_parcel(start_locker_id, end_locker_id, current_time, g)
+
     return "{'deliveryTime': '" + best.strftime("%d/%m/%Y, %H:%M:")+"'}", 200
 
 # POST - Add a new locker at a given location
@@ -144,7 +174,7 @@ async def addNewJourney():
 
     journey_id = await current_app.db.execute("INSERT INTO journey(startTime, endTime, distributorId) VALUES ($1, $2, $3) RETURNING journeyId INTO journeyId;", start_time, end_time, distributor_id)
 
-    gather([
+    await gather(*[
         current_app.db.execute("INSERT INTO journeyPoint(latitude, longitude, ordinalNumber, journeyId) VALUES ($1, $2, $3, $4);", point["latitude"], point["longitude"], i, journey_id)
         for i, point in enumerate(journey_points)
     ])        
@@ -165,7 +195,7 @@ async def getUsersRoute():
 
     current_app.db.fetchrow("SELECT (journeyId) INTO journeyPoint(latitude, longitude, ordinalNumber, journeyId) VALUES ($1, $2, $3, $4);", point["latitude"], point["longitude"], i, journey_id)
 
-    gather([
+    await gather(*[
         current_app.db.execute("INSERT INTO journeyPoint(latitude, longitude, ordinalNumber, journeyId) VALUES ($1, $2, $3, $4);", point["latitude"], point["longitude"], i, journey_id)
         for i, point in enumerate(journey_points)
     ])        

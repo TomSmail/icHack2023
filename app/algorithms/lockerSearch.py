@@ -2,7 +2,7 @@ import dataclasses
 import datetime
 from collections import defaultdict
 import heapq as hp
-from .findAdjacentNodes import Point
+from findAdjacentNodes import Point
 
 @dataclasses.dataclass
 class Edge:
@@ -60,11 +60,11 @@ class Graph:
                 if edge.start_time.hour < cur_time.hour:
                     ### Need to wait until the next day
                     next_time = datetime.datetime(year=cur_time.year,month=cur_time.month, day = cur_time.day+1)
-                    next_time += datetime.timedelta(hours = edge.start_time.hour)
+                    next_time += datetime.timedelta(hours = edge.start_time.hour, minutes = edge.start_time.minute)
                     earliest_arrival = next_time+edge.duration
                 else:
                     #print("HERE IN TIME")
-                    next_time = datetime.datetime(year=cur_time.year,month=cur_time.month, day = cur_time.day, hour=edge.start_time.hour)
+                    next_time = datetime.datetime(year=cur_time.year,month=cur_time.month, day = cur_time.day, hour=edge.start_time.hour, minute = edge.start_time.minute)
                     #print("NEXT TIME", next_time, edge.duration)
                     earliest_arrival = next_time+edge.duration
 

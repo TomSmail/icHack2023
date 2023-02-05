@@ -4,7 +4,6 @@ window.onload = buildMap();
 // INSERT BACKEND URL
 var backEndUrl = "";
 
-
 // adds tile layers
 function buildMap() {
     var map = L.map('map').setView([51.505, -0.09], 13);
@@ -28,12 +27,24 @@ async function getDropOffBoxes(map) {
     buildLocations(pointList, [], map);
 }
 
-async function createNewUser(userName, pfpUrl) {
-    const response = await fetch(backEndUrl + '/user/create');
-
+async function getUserNameAndPFP() {
+    const response = await fetch(backEndUrl + '/user/info');
+    return [response.json().balance, response.json().pfpUrl]
 }
 
 
+// POST requests
+//CHANGE THIS ENDPOINT SO THAT IT ADDS the pfp url and sends it correctly
+async function createNewUser(userName, pfpUrl) {
+    const response = await fetch(backEndUrl + '/user/create', 
+    { method: 'POST',
+    body: `{
+       "pfpUrl": $pfpUrl,
+       "userName": $userName,
+    }`
+    });
+
+}
 
 function buildLocations(circleData, pointData, map) {
     for (let i = 0; i < circleData.length; i++) {

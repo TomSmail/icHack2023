@@ -126,12 +126,12 @@ async def estimatedDeliveryTime():
 
 
 # For Distribution Front End
-# POST - create a user account 
+# POST - create a user account
 @distributorbp.route('/user/create', methods = ["POST"])
 async def createNewUserAccount():
     # create user with the required data
     username = request.get_json()["capacity"]
-    pfpUrl = request.get_json()["latitude"]
+    pfpUrl = request.get_json()["pfpUrl"]
     await current_app.db.execute("INSERT INTO user (username, pfpUrl) VALUES ($1, $2);", username, pfpUrl)
         
     return "{'status': 'Success'}", 200

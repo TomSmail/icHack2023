@@ -231,9 +231,9 @@ async def getLockerLocations():
 async def usernameToUserId():
     username = request.json()["username"]
     rowReturned = await current_app.db.fetchrow("SELECT distributorId FROM distributor WHERE username = $1", username)
-    return dumps({"username" : rowReturned["username"]}) 200
+    return dumps({"username" : rowReturned["username"]}), 200
 
-    
+
 # For the backend
 # Determine a parcel's route <- Luke
 # Set a parcel's route into the database

@@ -64,7 +64,7 @@ async def placeParcelOnArrival():
     return "{'status': 'Success'}", 200
 
 # POST - Add a new parcel into the system
-@producerbp.route('/parcel/create', method = ["POST"])
+@producerbp.route('/parcel/create', methods = ["POST"])
 async def createNewParcel():
     # Create a new parcel row with the data as provided by the user.
 
@@ -128,7 +128,7 @@ async def dbBuildGraph():
     return g
 
 # GET - estimated delivery time from a given start locker
-@producerbp.route('/locker/estimate', method = ["GET"])
+@producerbp.route('/locker/estimate', methods = ["GET"])
 async def estimatedDeliveryTime():
     start_locker_id = request.args.get()["start_locker"]
     end_locker_id = request.args.get()["end_locker"]
@@ -141,7 +141,7 @@ async def estimatedDeliveryTime():
 
 # POST - Add a new locker at a given location
 @producerbp.route('/locker/create', methods = ["POST"])
-async def estimatedDeliveryTime():
+async def createLocker():
     # Add a value to the database for a new locker
 
     capacity = request.get_json()["capacity"]
@@ -202,7 +202,7 @@ async def getUsersRoute():
     return "Hello", 200
 
 # GET - user's balance and PFP
-@distributorbp.route('/user/info', method = ["GET"])
+@distributorbp.route('/user/info', methods = ["GET"])
 async def getUserInfo():
     user_id = request.args.get()["user_id"]
 
@@ -217,7 +217,7 @@ async def getUserInfo():
     return dumps(result), 200,
 
 # GET - locker locations
-@distributorbp.route('/locker/getall', method = ["GET"])
+@distributorbp.route('/locker/getall', methods = ["GET"])
 async def getLockerLocations():
     lockerRows = await current_app.db.fetchrow("SELECT (latitude, longitude, lockerId) FROM locker;")
     nodes = []
@@ -227,7 +227,7 @@ async def getLockerLocations():
     return dumps({"lockers": nodes}), 200
 
 # GET - username to user id
-@distributorbp.route('/locker/getall', methods = ["GET"])
+@distributorbp.route('/user/getid', methods = ["GET"])
 async def usernameToUserId():
     username = request.args.get()["username"]
     rowReturned = await current_app.db.fetchrow("SELECT distributorId FROM distributor WHERE username = $1", username)

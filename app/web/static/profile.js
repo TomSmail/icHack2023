@@ -1,9 +1,17 @@
 window.onload = getprofiledata();
 
-function getprofiledata() {
-    profileButton("Bob Ross", "420.69", "./bobross.jpeg")
-    if (document.cookie.indexOf("userid=") < 0) {
 
+function getprofiledata() {
+
+    const response = fetch('api/distributor/user/info');
+    console.log(response)
+
+
+
+    profileButton("Bob Ross", "420.69", "./bobross.jpeg")
+
+
+    if (document.cookie.match(/^(.*;)?\s*userid\s*=\s*[^;]+(.*)?$/)) {
         window.location.href = "/login";
 
     }

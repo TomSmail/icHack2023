@@ -154,33 +154,8 @@ async def createLocker():
     return "{'status': 'Success'}", 200
 
 
+
 # For Distribution Front End
-# POST - create a user account
-@distributorbp.route('/user/create', methods = ["POST"])
-async def createNewUserAccount():
-    # create user with the required data
-    username = request.get_json()["capacity"]
-    pfpUrl = request.get_json()["pfpUrl"]
-    await current_app.db.execute("INSERT INTO user (username, pfpUrl) VALUES ($1, $2);", username, pfpUrl)
-        
-    return "{'status': 'Success'}", 200
-
-# POST - add a journey
-@distributorbp.route('/journey/add', methods = ["POST"])
-async def addNewJourney():
-    distributor_id = request.get_json()["distributor_id"]
-    start_time = request.get_json()["start_time"]
-    end_time = request.get_json()["end_time"]
-    journey_points = request.get_json()["journey_points"]
-
-    journey_id = await current_app.db.execute("INSERT INTO journey(startTime, endTime, distributorId) VALUES ($1, $2, $3) RETURNING journeyId INTO journeyId;", start_time, end_time, distributor_id)
-
-    await gather(*[
-        current_app.db.execute("INSERT INTO journeyPoint(latitude, longitude, ordinalNumber, journeyId) VALUES ($1, $2, $3, $4);", point["latitude"], point["longitude"], i, journey_id)
-        for i, point in enumerate(journey_points)
-    ])        
-
-    return "{'status': 'Success'}", 200
 
 # GET - user's journey and start and end locker locations, and like a way of identifying the parcel.
 # provide route event id
@@ -197,6 +172,34 @@ async def getUsersRoute():
         "parcelId": rowReturned["parcelId"]        
     }
     return dumps(result), 200
+
+# POST - create a user account
+@distributorbp.route('/user/create', methods = ["POST"])
+async def createNewUserAccount():
+    # create user with the required data
+    username = request.get_json()["capacity"]
+    pfpUrl = request.get_json()["pfpUrl"]
+    await current_app.db.execute("INSERT INTO user (username, pfpUrl) VALUES ($1, $2);", username, pfpUrl)
+        
+    return "{'status': 'Success'}", 200
+
+# POST - add a journey
+@distributorbp.route('/journey/add', methods = ["POST"])
+async def addNewJourney():
+    print(await request.get_data())
+    distributor_id = (await request.get_json())["distributor_id"]
+    start_time =  datetime.strptime((await request.get_json())["start_time"], '%Y-%m-%d %H:%M:%S')
+    end_time = datetime.strptime((await request.get_json()["end_time"], '%Y-%m-%d %H:%M:%S'))
+    journey_points = (await request.get_json())["journey_points"]
+
+    journey_id = await current_app.db.execute("INSERT INTO journey(startTime, endTime, distributorId) VALUES ($1, $2, $3) RETURNING journeyId INTO journeyId;", start_time, end_time, distributor_id)
+
+    await gather(*[
+        current_app.db.execute("INSERT INTO journeyPoint(latitude, longitude, ordinalNumber, journeyId) VALUES ($1, $2, $3, $4);", point["latitude"], point["longitude"], i, journey_id)
+        for i, point in enumerate(journey_points)
+    ])        
+
+    return "{'status': 'Success'}", 200
 
 # GET - user's balance and PFP
 @distributorbp.route('/user/info', methods = ["GET"])

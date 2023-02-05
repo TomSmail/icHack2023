@@ -1,10 +1,10 @@
-INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.4999, -0.1781);
-INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.4994, -0.1771);
-INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.5009, -0.1774);
-INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.4998, -0.1757);
-INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.5013, -0.1248);
-INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.4994, -0.1771);
-INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.5007, -0.1246);
+INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.50073085460111, -0.18378635786638767);
+INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.50025666086443, -0.17269274202952095);
+INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.50464443426626, -0.174902882077271);
+INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.5109679594428, -0.17566443451947997);
+INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.51524263671098, -0.16861754808597962);
+INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.50562314209575, -0.1874391721539224);
+INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.518807437201076, -0.17271952636313428);
 
 INSERT INTO distributor ( balance, username, pfpUrl, failedDeliveries, succeededDeliveries)
     VALUES ( 100.12, 'bross', 'https://www.bobross.com/content/bob_ross_img.png', 1, 1000);
@@ -25,11 +25,11 @@ INSERT INTO journey ( distributorId) VALUES ( 1);
 INSERT INTO journey ( distributorId) VALUES ( 2);
 
 INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
-    VALUES (0, 1, '8:25:00', 51.4996, -0.1771);
+    VALUES (0, 1, '8:25:00', 51.516527191127125, -0.1708326439641144);
 INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
-    VALUES (1, 1, '9:14:18', 50.4996, -0.1782);
+    VALUES (1, 1, '9:14:18', 51.50666838287783, -0.17104711045078022);
 INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
-    VALUES (2, 1, '10:54:32', 51.5007, -0.1782);
+    VALUES (2, 1, '10:54:32', 51.49885223966222, -0.17679456094944745);
 
 INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
     VALUES (0, 2, '16:57:42', 51.4999, -0.1781);

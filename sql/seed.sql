@@ -61,7 +61,14 @@ INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.5013, -0.1248
 INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.5014, -0.1248);
 INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.5007, -0.1246);
 
-INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.2007, -0.1246);
+INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.4507, -0.1246);
+
+
+INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.5114, -0.1921);
+INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.5052, -0.1521);
+
+INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.6114, -0.1421);
+INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.6052, -0.1621);
 
 
 INSERT INTO distributor ( balance, username, pfpUrl, failedDeliveries, succeededDeliveries)
@@ -94,7 +101,7 @@ INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longit
 INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
    VALUES (1, 2, '17:54:32', 51.2006, -0.1245);
 INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
-   VALUES (2, 2, '18:01:25', 51.50013, -0.1246);
+   VALUES (2, 2, '18:01:25', 51.4511, -0.1246);
 
 -- INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
 --    VALUES (0, 2, '16:57:42', 51.4999, -0.1781);

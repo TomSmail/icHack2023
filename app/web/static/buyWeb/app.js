@@ -1,4 +1,4 @@
-const api_url ="http://127.0.0.1:2025/";
+// const api_url ="http://127.0.0.1:2025/";
   
 // Defining async function
 
@@ -8,7 +8,7 @@ async function buy() {
          "end_locker": 5 
     } 
     
-    const response = await fetch(api_url + "api/producer/parcel/create", {
+    const response = await fetch("/api/producer/parcel/create", {
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
         cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
         headers: {
@@ -31,7 +31,7 @@ async function buy() {
 async function getapi(url) {
     
     // Storing response
-    const response = await fetch(url + 'api/producer/locker/estimate?' + new URLSearchParams({
+    const response = await fetch(url + '/api/producer/locker/estimate?' + new URLSearchParams({
         start_locker: 1,
         end_locker: 5,
     }));

@@ -9,6 +9,8 @@ async def index():
     return await webbp.send_static_file("index.html")
 
 
+
+
 @webbp.route('/register')
 async def rerg():
     if request.method == "GET":

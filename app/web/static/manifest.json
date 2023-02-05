@@ -1,14 +1,22 @@
 {
-    "name": "DeliverU",
-    "short_name": "DeliverU",
-    "start_url": "/index.html",
+    "name": "GreenShip",
+    "short_name": "GreenShip",
+    "start_url": "index.html",
+    "display": "standalone",
+    "orientation": "portrait",
     "theme_color": "#000000",
     "background_color": "#ffffff",
     "lang": "en",
     "icons": [
         {
-            "src": "/applogo.png",
-            "sizes": "128x128"
+            "src": "icons/icon-144.png",
+            "type": "image/png",
+            "sizes": "144x144"
+        },
+        {
+            "src": "icons/icon-192.png",
+            "type": "image/png",
+            "sizes": "192x192"
         }
     ]
 }

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- links to css -->
+    <link rel="stylesheet" href="map.css">
+    <!-- json file-->
+    <link rel="manifest" href="/manifest.json">
+    <!-- setup for setting device witdth -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <!-- Leaflets CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+        integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <!-- Leaflet Javascript (needs to be after css) -->
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <!-- link to javascript, requires defer to load js after "map" initialised-->
+    <script src="mapping.js" defer></script>
+
+
+</head>
+
+<body>
+
+    <div id="map"></div>
+    
+</body>
+
+</html>

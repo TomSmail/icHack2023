@@ -107,19 +107,20 @@ async def dbBuildGraph():
     journeyRows = await current_app.db.fetch("SELECT (journeyId, distributorId) FROM journey;")
     journeySegments = []
     for journey in journeyRows:
-        journeyPoints = await current_app.db.fetch("SELECT (arrivalTime, latitude, longitude) FROM journeyPoint WHERE journeyId = $1 ORDER BY ordinalNumber;", journey["journeyId"])
+        journeyPoints = await current_app.db.fetch("SELECT (arrivalTime, latitude, longitude) FROM journeyPoint WHERE journeyId = $1 ORDER BY ordinalNumber;", journey["row"][0])
         for i,pt in enumerate(journeyPoints[:-1]):
+            print(journeyPoints)
             journeySegments.append(Journey(
-                pt["arrivalTime"], journeyPoints[i+1]["arrivalTime"], 
-                Point(pt["latitude"], pt["longitude"]),
-                Point(journeyPoints[i+1]["latitude"], journeyPoints[i+1]["longitude"]),
-                journey["distributorId"]
+                pt["row"][0], journeyPoints[i+1]["row"][0], 
+                Point(pt["row"][1], pt["row"][2]),
+                Point(journeyPoints[i+1]["row"][1], journeyPoints[i+1]["row"][2]),
+                journey["row"][1]
             ))
     
     lockerRows = await current_app.db.fetch("SELECT (latitude, longitude, lockerId) FROM locker;")
     nodes = []
     for row in lockerRows:
-        nodes.append(Node(Point(row["latitude"], row["longitude"]), row["lockerId"]))
+        nodes.append(Node(Point(row["row"][0], row["row"][1]), row["row"][2]))
         
     g = Graph()
 
@@ -129,17 +130,7 @@ async def dbBuildGraph():
 
     return g
 
-# GET - estimated delivery time from a given start locker
-@producerbp.route('/locker/estimate', methods = ["GET"])
-async def estimatedDeliveryTime():
-    start_locker_id = request.args.get()["start_locker"]
-    end_locker_id = request.args.get()["end_locker"]
-    current_time = datetime.now()
 
-    g = dbBuildGraph()
-    best, path = route_parcel(start_locker_id, end_locker_id, current_time, g)
-
-    return "{'deliveryTime': '" + best.strftime("%d/%m/%Y, %H:%M:")+"'}", 200
 
 # POST - Add a new locker at a given location
 @producerbp.route('/locker/create', methods = ["POST"])
@@ -173,15 +164,27 @@ async def getUsersRoute():
     }
     return dumps(result), 200
 
-# POST - create a user account
-@distributorbp.route('/user/create', methods = ["POST"])
-async def createNewUserAccount():
-    # create user with the required data
-    username = request.get_json()["capacity"]
-    pfpUrl = request.get_json()["pfpUrl"]
-    await current_app.db.execute("INSERT INTO user (username, pfpUrl) VALUES ($1, $2);", username, pfpUrl)
+# GET - estimated delivery time from a given start locker
+@producerbp.route('/locker/estimate', methods = ["GET"])
+async def estimatedDeliveryTime():
+    start_locker_id = request.args.get("start_locker")
+    end_locker_id = request.args.get("end_locker")
+    current_time = datetime.now()
+
+    g = await dbBuildGraph()
+    best, path = route_parcel(start_locker_id, end_locker_id, current_time, g)
+
+    return "{'deliveryTime': '" + best.strftime("%d/%m/%Y, %H:%M:")+"'}", 200
+
+# # POST - create a user account
+# @distributorbp.route('/user/create', methods = ["POST"])
+# async def createNewUserAccount():
+#     # create user with the required data
+#     username = request.get_json()["capacity"]
+#     pfpUrl = request.get_json()["pfpUrl"]
+#     await current_app.db.execute("INSERT INTO user (username, pfpUrl) VALUES ($1, $2);", username, pfpUrl)
         
-    return "{'status': 'Success'}", 200
+#     return "{'status': 'Success'}", 200
 
 # POST - add a journey
 @distributorbp.route('/journey/add', methods = ["POST"])
@@ -191,7 +194,7 @@ async def addNewJourney():
     journey_points = (await request.get_json())["journey_points"]
 
     journey_id = await current_app.db.fetchval("INSERT INTO journey(distributorId) VALUES ($1) RETURNING journeyId;", distributor_id)
-
+    print(journey_id)
     for i, point in enumerate(journey_points):   
         await current_app.db.execute("INSERT INTO journeyPoint(latitude, longitude, ordinalNumber, journeyId, arrivalTime) VALUES ($1, $2, $3, $4, $5);", point["latitude"], point["longitude"], i, journey_id, 
              datetime.strptime(point["arrival_time"], '%Y-%m-%d %H:%M:%S')

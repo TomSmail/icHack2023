@@ -17,7 +17,7 @@ class Graph:
     MAX_DAYS = 99999999
     def __init__(self):
         self.edges = defaultdict(list)
-        self.parents = defaultdict(lambda: -1)
+        self.parents = defaultdict(lambda: (-1,-1,-1,-1))
 
     def add_edge(self, u, v, start_dt : datetime.time, duration, userResponsible : int):
         self.edges[u].append(Edge(v, start_dt, duration, userResponsible))
@@ -30,7 +30,7 @@ class Graph:
 
     def find_best(self, start_id, end_id, start_time):
         # TODO - Fix when to start date, at the moment just 04/01/2023 at 9am
-        self.parents = defaultdict(lambda: -1)
+        self.parents = defaultdict(lambda: (-1,-1,-1,-1))
         #START_DATE = datetime.datetime(2023, 1,4,9)
         MAX_YEAR = datetime.datetime(year=9999, month=1, day=1)
         best = defaultdict(lambda: MAX_YEAR)
@@ -77,7 +77,8 @@ class Graph:
     def traceback(self, start_id, end_id):
 
         route = []
-        while end_id != start_id:
+        while end_id != start_id and end_id != -1:
+            print(end_id, start_id)
             next_node, arr_time, dep_time, user = self.parents[end_id]
             if next_node == -1:
                 break
@@ -91,14 +92,14 @@ class Graph:
 
 
 
-def route_parcel(start_node_id, end_node_id, edgeList, start_time, g):
+def route_parcel(start_node_id, end_node_id, start_time, g):
 
-    for (start_id, end_id, stime, duration) in edgeList:
-        #print(type(stime))
-        assert type(stime) == datetime.time
-        assert type(duration) == datetime.timedelta
+    # for (start_id, end_id, stime, duration) in edgeList:
+    #     #print(type(stime))
+    #     assert type(stime) == datetime.time
+    #     assert type(duration) == datetime.timedelta
 
-        g.add_edge(start_id, end_id, stime, duration)
+    #     g.add_edge(start_id, end_id, stime, duration)
 
     res = g.find_best(start_node_id, end_node_id, start_time)
     path = g.traceback(start_node_id, end_node_id)

@@ -1,6 +1,6 @@
 # greenship
 
-<img src='app/web/static/logo.png' />
+<img align="right" src='app/web/static/logo.svg' />
 
 Online delivery now dominates shopping habits. Amazon alone carries over 1.6mn packages worldwide per day, which contributes to a phenomenal amount of shipping-induced carbon emissions. In our own city, London, deliveries account for a quarter of all transport-attributable carbon emissions.
 

@@ -187,17 +187,15 @@ async def createNewUserAccount():
 @distributorbp.route('/journey/add', methods = ["POST"])
 async def addNewJourney():
     print(await request.get_data())
-    distributor_id = (await request.get_json())["distributor_id"]
-    start_time =  datetime.strptime((await request.get_json())["start_time"], '%Y-%m-%d %H:%M:%S')
-    end_time = datetime.strptime((await request.get_json()["end_time"], '%Y-%m-%d %H:%M:%S'))
+    distributor_id = int((await request.get_json())["distributor_id"])
     journey_points = (await request.get_json())["journey_points"]
 
-    journey_id = await current_app.db.execute("INSERT INTO journey(startTime, endTime, distributorId) VALUES ($1, $2, $3) RETURNING journeyId INTO journeyId;", start_time, end_time, distributor_id)
+    journey_id = await current_app.db.fetchval("INSERT INTO journey(distributorId) VALUES ($1) RETURNING journeyId;", distributor_id)
 
-    await gather(*[
-        current_app.db.execute("INSERT INTO journeyPoint(latitude, longitude, ordinalNumber, journeyId) VALUES ($1, $2, $3, $4);", point["latitude"], point["longitude"], i, journey_id)
-        for i, point in enumerate(journey_points)
-    ])        
+    for i, point in enumerate(journey_points):   
+        await current_app.db.execute("INSERT INTO journeyPoint(latitude, longitude, ordinalNumber, journeyId, arrivalTime) VALUES ($1, $2, $3, $4, $5);", point["latitude"], point["longitude"], i, journey_id, 
+             datetime.strptime(point["arrival_time"], '%Y-%m-%d %H:%M:%S')
+       )
 
     return "{'status': 'Success'}", 200
 

@@ -14,16 +14,11 @@
     <!-- Leaflet Javascript (needs to be after css) -->
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
         integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
-    
-    <script src="app.js"></script>
 
     <!-- link to javascript, requires defer to load js after "map" initialised-->
-    <script src="mapping.js" defer></script>
-    <!-- enables profile page being added -->
-    <script src="profile.js" defer></script>
-    <script src="flipout.js" defer></script>
-    <!-- font awesome! -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- <script src="mapping.js" defer></script> -->
+    <!-- ABDSOLUTELY EVERYTHING -->
+    <script src="all.js" defer></script>
 
 
 </head>
@@ -44,12 +39,17 @@
         <div id="secondary">
             <div class="profile">
                 <div class="imgcontainer">
-                    <img id="imgcontainer" width="100%" height="100%" style="border-radius: 50%;">
+                    <img id="imgcontainer" width="100%" height="100%" style="border-radius: 50%;   object-fit: cover;">
                 </div>
                 <div class="profileinfo">
                     <h2 id="name">Loading... </h2>
                     <p id="balance"></p>
                 </div>
+            </div>
+            <div id="routes">
+                <!-- <div onclick="selectRoute(this)" class="route" id="0">
+                    <h3>Route num: 2</h3>
+                </div> -->
             </div>
 
         </div>

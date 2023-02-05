@@ -11,8 +11,11 @@ import datetime
 def getArcs(journeys, nodes):
     arcs = []
     adjNodesDict = getAdjNodesDict(journeys, nodes)
+    print("dictionaiauguiasgfuisaheifoa")
+    print(adjNodesDict)
     for node in nodes:
-        arcs.extend(adjNodesDict[node])
+        if str(node) in adjNodesDict:
+            arcs.extend(adjNodesDict[str(node)])
     return arcs
 
 # output: dictionary with key node and list of startId, endId, startTime and duration
@@ -22,16 +25,18 @@ def getAdjNodesDict(journeys, nodes):
     # goes through each journey each person makes
     for journey in journeys:
         # goes through each locker a person could start at
-        for startNode in pointNodesDict[journey.startLocation]:
+        for startNode in pointNodesDict[str(journey.startLocation)]:
             startNodeAdjNodes = []
             # goes through each locker a person could go to
-            for endNode in pointNodesDict[journey.endLocation]:
+            for endNode in pointNodesDict[str(journey.endLocation)]:
                 # adds the nodes that are adjacent to the start nodes to a list
                 # which is then added to the dictionary later
+                print(type(journey.startTime))
                 assert type(journey.startTime) == datetime.datetime
 
-                startNodeAdjNodes.append([startNode.id, endNode.id, journey.startTime.time(), journey.endTime - journey.startTime])
-        adjNodesDict[startNode] = startNodeAdjNodes
+                startNodeAdjNodes.append([startNode.id, endNode.id, journey.startTime.time(), journey.endTime - journey.startTime, journey.userResponsibleId, journey.startLocation, journey.endLocation])
+        adjNodesDict[str(startNode)] = startNodeAdjNodes
+        print(startNodeAdjNodes)
     return adjNodesDict
 
 # returns lockers that person could go to at a drop off / pick up location
@@ -48,15 +53,22 @@ def getPointNodesDict(journeys, nodes):
             # add it to the list of lockers close to the point
             # which will be added to the dictionary later
             if(nearBy(journey.startLocation, node.location, nearByMaxDist)):
+                print("start")
+                print(journey)
                 nodesCloseToJourneyStart.append(node)
             if(nearBy(journey.endLocation, node.location, nearByMaxDist)):
+                print("end")
+                print(journey)
                 nodesCloseToJourneyEnd.append(node)
                 
-        pointNodesDict[journey.startLocation] = nodesCloseToJourneyStart
-        pointNodesDict[journey.endLocation] = nodesCloseToJourneyEnd
+        pointNodesDict[str(journey.startLocation)] = nodesCloseToJourneyStart
+        pointNodesDict[str(journey.endLocation)] = nodesCloseToJourneyEnd
     return pointNodesDict
 
 def nearBy(p1, p2, dist):
+    print("Distance")
+    print(distance.distance((p1.lat, p1.long), (p2.lat, p2.long)).meters)
+    print(distance.distance((p1.lat, p1.long), (p2.lat, p2.long)).meters <= dist)
     return distance.distance((p1.lat, p1.long), (p2.lat, p2.long)).meters <= dist
 
 
@@ -65,6 +77,8 @@ import dataclasses
 class Point:
     lat: float
     long: float
+    id: int
+  
 
 @dataclasses.dataclass
 class Node:
@@ -80,10 +94,9 @@ class Journey:
     userResponsibleId: int
 
 
-
 if __name__ == "__main__":
-    t1 = Point(52.1951, 0.1313)
-    t2 = Point(51.5072, 0.1276)
+    t1 = Point(52.1951, 0.1313, None)
+    t2 = Point(51.5072, 0.1276, None)
 
 
 

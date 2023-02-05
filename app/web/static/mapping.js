@@ -60,7 +60,6 @@ function addDropOffBox(xCoord, yCoord, destinationBool){
     });
 }
 
-
 function addTask(taskDialogue, taskTitle, ) {
 
 }

@@ -3,7 +3,7 @@
 
 <head>
     <!-- links to css -->
-    <link rel="stylesheet" href="map.css">
+    <link rel="stylesheet" href="main.css">
     <!-- json file-->
     <link rel="manifest" href="/manifest.json">
     <!-- setup for setting device witdth -->
@@ -18,6 +18,8 @@
     <script src="mapping.js" defer></script>
     <!-- enables profile page being added -->
     <script src="profile.js" defer></script>
+    <script src="flipout.js" defer></script>
+
 
 </head>
 
@@ -27,16 +29,21 @@
             <div id="map"></div>
 
             <div class="overlay">
-                <div class="button" onclick="profileButton()">
+                <div class="flipbutton" onclick="flip()">
                 </div>
 
-                <div class="profile-photo" onclick="profileButton()"></div>
             </div>
         </div>
         <!-- this is empty until press profile button -->
-        <div class="secondary">
-            <div id="profile">
-                <p>Hello!</p>
+        <div id="secondary">
+            <div class="profile">
+                <div class="imgcontainer">
+                    <img id="imgcontainer" width="100%" height="100%">
+                </div>
+                <div class="profileinfo">
+                    <h2 id="name">Loading... </h2>
+                    <p id="balance"></p>
+                </div>
             </div>
 
         </div>

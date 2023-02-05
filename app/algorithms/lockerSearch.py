@@ -10,6 +10,7 @@ class Edge:
     start_time : datetime.time
     duration: datetime.timedelta
 
+### Arc is a (start_id, end_id, stime, duration)
 class Graph:
 
     MAX_DAYS = 99999999
@@ -20,17 +21,23 @@ class Graph:
     def add_edge(self, u, v, start_dt : datetime.time, duration):
         self.edges[u].append(Edge(v, start_dt, duration))
 
-    def find_best(self, start_id, end_id):
+    def build_graph(self, arcs):
+
+        for arc in arcs:
+            self.add_edge(*arc)
+
+
+    def find_best(self, start_id, end_id, start_time):
         # TODO - Fix when to start date, at the moment just 04/01/2023 at 9am
         self.parents = defaultdict(lambda: -1)
-        START_DATE = datetime.datetime(2023, 1,4,9)
+        #START_DATE = datetime.datetime(2023, 1,4,9)
         MAX_YEAR = datetime.datetime(year=9999, month=1, day=1)
         best = defaultdict(lambda: MAX_YEAR)
-        best[start_id] = START_DATE
+        best[start_id] = start_time
         prioq = []
         hp.heapify(prioq)
 
-        hp.heappush(prioq, (START_DATE, start_id))
+        hp.heappush(prioq, (start_time, start_id))
 
         while len(prioq) > 0:
             cur_time : datetime.datetime
@@ -83,9 +90,8 @@ class Graph:
 
 
 
-def route_parcel(start_node_id, end_node_id, edgeList):
+def route_parcel(start_node_id, end_node_id, edgeList, start_time, g):
 
-    g = Graph()
     for (start_id, end_id, stime, duration) in edgeList:
         #print(type(stime))
         assert type(stime) == datetime.time
@@ -93,15 +99,15 @@ def route_parcel(start_node_id, end_node_id, edgeList):
 
         g.add_edge(start_id, end_id, stime, duration)
 
-    res = g.find_best(start_node_id, end_node_id)
+    res = g.find_best(start_node_id, end_node_id, start_time)
     path = g.traceback(start_node_id, end_node_id)
 
     return res, path
 
 
 if __name__ == "__main__":
-    #testdate = datetime.datetime(2023, 1, 4, 9, 3, 1)
-
+    testdate = datetime.datetime(2023, 1, 4, 9, 3, 1)
+    print(testdate.strftime("%d/%m/%Y, %H:%M:"))
     #print(route_parcel(0,1, [(0,1, testdate.time(), datetime.timedelta(hours = 2))]))
 
     tgraph = Graph()
@@ -144,7 +150,7 @@ if __name__ == "__main__":
 
 
 
-    print(tgraph.find_best(1, 5))
+    print(tgraph.find_best(1, 5, testdate))
     res = tgraph.traceback(1, 5)
 
 

@@ -5,8 +5,8 @@ create table IF NOT exists locker(
     longitude real
 );
 
-CREATE TABLE  IF NOT exists parcel(
-    parcelId  SERIAL PRIMARY KEY,
+CREATE TABLE IF NOT exists parcel(
+    parcelId SERIAL PRIMARY KEY,
     dateIntoSystem DATE,
     dateIntoLocker DATE,
     lockerIn INTEGER,
@@ -28,15 +28,14 @@ CREATE TABLE IF NOT exists distributor(
 
 CREATE TABLE IF NOT exists journey(
     journeyId SERIAL PRIMARY KEY,
-    startTime TIME, 
-    endTime TIME,
     distributorId INTEGER,
     FOREIGN key(distributorId) REFERENCES distributor(distributorId)
 );
 
 create table IF NOT exists journeyPoint(
     ordinalNumber SERIAL,
-    journeyId INTEGER,
+    journeyId INTEGER, 
+    arrivalTime TIME,
     latitude real,
     longitude real,
     foreign key(journeyId) references journey(journeyId)
@@ -44,9 +43,7 @@ create table IF NOT exists journeyPoint(
 
 CREATE TABLE route(
     routeId SERIAL primary key,
-    userDoing INTEGER,
     parcelId INTEGER,
-    FOREIGN KEY (userDoing) REFERENCES distributor(distributorId)   
 );
 
 CREATE TABLE routeEvent(
@@ -56,9 +53,11 @@ CREATE TABLE routeEvent(
     currLockerId INTEGER,
     routeId INTEGER,
     parcelId INTEGER,
+    userDoing INTEGER,
     FOREIGN KEY (parcelId) REFERENCES parcel(parcelId),
     FOREIGN KEY (nextLockerId) REFERENCES locker(lockerId),
     FOREIGN KEY (currLockerId) REFERENCES locker(lockerId),	
     FOREIGN KEY (routeId) REFERENCES route(routeId)
+    FOREIGN KEY (userDoing) REFERENCES distributor(distributorId)   
 );
 	

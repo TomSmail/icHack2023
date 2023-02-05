@@ -9,6 +9,7 @@ class Edge:
     end_id : int
     start_time : datetime.time
     duration: datetime.timedelta
+    userResponsible: int
 
 ### Arc is a (start_id, end_id, stime, duration)
 class Graph:
@@ -18,8 +19,8 @@ class Graph:
         self.edges = defaultdict(list)
         self.parents = defaultdict(lambda: -1)
 
-    def add_edge(self, u, v, start_dt : datetime.time, duration):
-        self.edges[u].append(Edge(v, start_dt, duration))
+    def add_edge(self, u, v, start_dt : datetime.time, duration, userResponsible : int):
+        self.edges[u].append(Edge(v, start_dt, duration, userResponsible))
 
     def build_graph(self, arcs):
 
@@ -27,17 +28,17 @@ class Graph:
             self.add_edge(*arc)
 
 
-    def find_best(self, start_id, end_id):
+    def find_best(self, start_id, end_id, start_time):
         # TODO - Fix when to start date, at the moment just 04/01/2023 at 9am
         self.parents = defaultdict(lambda: -1)
-        START_DATE = datetime.datetime(2023, 1,4,9)
+        #START_DATE = datetime.datetime(2023, 1,4,9)
         MAX_YEAR = datetime.datetime(year=9999, month=1, day=1)
         best = defaultdict(lambda: MAX_YEAR)
-        best[start_id] = START_DATE
+        best[start_id] = start_time
         prioq = []
         hp.heapify(prioq)
 
-        hp.heappush(prioq, (START_DATE, start_id))
+        hp.heappush(prioq, (start_time, start_id))
 
         while len(prioq) > 0:
             cur_time : datetime.datetime
@@ -66,7 +67,7 @@ class Graph:
 
 
                 if earliest_arrival < best[edge.end_id]:
-                    self.parents[edge.end_id] = (next_node, earliest_arrival, next_time)
+                    self.parents[edge.end_id] = (next_node, earliest_arrival, next_time, edge.userResponsible)
                     best[edge.end_id] = earliest_arrival
                     hp.heappush(prioq, (earliest_arrival, edge.end_id))
 
@@ -77,10 +78,10 @@ class Graph:
 
         route = []
         while end_id != start_id:
-            next_node, arr_time, dep_time = self.parents[end_id]
+            next_node, arr_time, dep_time, user = self.parents[end_id]
             if next_node == -1:
                 break
-            route.append((next_node, end_id, dep_time, arr_time))
+            route.append((next_node, end_id, dep_time, arr_time, user))
             end_id = next_node
 
         route = list(reversed(route))
@@ -90,9 +91,8 @@ class Graph:
 
 
 
-def route_parcel(start_node_id, end_node_id, edgeList):
+def route_parcel(start_node_id, end_node_id, edgeList, start_time, g):
 
-    g = Graph()
     for (start_id, end_id, stime, duration) in edgeList:
         #print(type(stime))
         assert type(stime) == datetime.time
@@ -100,7 +100,7 @@ def route_parcel(start_node_id, end_node_id, edgeList):
 
         g.add_edge(start_id, end_id, stime, duration)
 
-    res = g.find_best(start_node_id, end_node_id)
+    res = g.find_best(start_node_id, end_node_id, start_time)
     path = g.traceback(start_node_id, end_node_id)
 
     return res, path
@@ -118,41 +118,41 @@ if __name__ == "__main__":
     edge1time = datetime.time(9) ### 9am today
     edge1td = datetime.timedelta(hours=2)
 
-    tgraph.add_edge(1,2, edge1time, edge1td)
+    tgraph.add_edge(1,2, edge1time, edge1td, 1)
 
 
     edge2time = datetime.time(23) ### 9pm today
     edge2td = datetime.timedelta(hours=3)
 
-    tgraph.add_edge(2,5, edge2time, edge2td)
+    tgraph.add_edge(2,5, edge2time, edge2td, 2)
 
 
 
     edge3time = datetime.time(10) #10am
     edge3td = datetime.timedelta(hours=1)
 
-    tgraph.add_edge(1,3, edge3time, edge3td)
+    tgraph.add_edge(1,3, edge3time, edge3td, 1)
 
     edge4time = datetime.time(9)
     edge4td = datetime.timedelta(hours=1)
 
-    tgraph.add_edge(3,4, edge4time, edge4td)
+    tgraph.add_edge(3,4, edge4time, edge4td, 3)
 
 
     edge5time = datetime.time(10)
     edge5td = datetime.timedelta(hours=3)
 
-    tgraph.add_edge(1,4, edge5time, edge5td)
+    tgraph.add_edge(1,4, edge5time, edge5td, 3)
 
     edge6time = datetime.time(14)
     edge6td = datetime.timedelta(hours=3)
 
-    tgraph.add_edge(4,5, edge6time, edge6td)
+    tgraph.add_edge(4,5, edge6time, edge6td, 1)
 
 
-
-    print(tgraph.find_best(1, 5))
+    print(tgraph.find_best(1, 5, testdate))
     res = tgraph.traceback(1, 5)
+
 
 
 

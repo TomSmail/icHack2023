@@ -90,18 +90,22 @@ INSERT INTO distributor ( balance, username, pfpUrl, failedDeliveries, succeeded
 
 INSERT INTO journey ( distributorId) VALUES ( 1);
 INSERT INTO journey ( distributorId) VALUES ( 2);
+INSERT INTO journey ( distributorId) VALUES ( 1);
 
 
 INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
    VALUES (0, 1, '11:25:00', 51.5000, -0.1781);
 INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
    VALUES (1, 1, '11:55:00', 51.5012, -0.1248);
+
 INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
    VALUES (0, 2, '17:14:18', 51.4996, -0.1782);
 INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
    VALUES (1, 2, '17:54:32', 51.2006, -0.1245);
 INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
-   VALUES (2, 2, '18:01:25', 51.4511, -0.1246);
+   VALUES (0, 3, '17:58:32', 51.2006, -0.1245);
+INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
+   VALUES (1, 3, '18:22:25', 51.4511, -0.1246);
 
 -- INSERT INTO journeyPoint(ordinalNumber, journeyId, arrivalTime, latitude, longitude)
 --    VALUES (0, 2, '16:57:42', 51.4999, -0.1781);

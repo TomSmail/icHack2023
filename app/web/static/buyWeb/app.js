@@ -4,8 +4,8 @@
 
 async function buy() {
     const data = {
-         "start_locker": 1,
-         "end_locker": 5 
+         "start_locker": 2,
+         "end_locker": 6 
     } 
     
     const response = await fetch("/api/producer/parcel/create", {
@@ -32,8 +32,8 @@ async function getapi() {
     
     // Storing response
     const response = await fetch( '/api/producer/locker/estimate?' + new URLSearchParams({
-        start_locker: 1,
-        end_locker: 5,
+        start_locker: 2,
+        end_locker: 6,
     }));
     
     // Storing data in form of JSON

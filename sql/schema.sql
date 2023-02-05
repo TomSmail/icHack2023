@@ -54,6 +54,7 @@ CREATE TABLE routeEvent(
     routeId INTEGER,
     parcelId INTEGER,
     userDoing INTEGER,
+    routeEventId INTEGER,
     FOREIGN KEY (parcelId) REFERENCES parcel(parcelId),
     FOREIGN KEY (nextLockerId) REFERENCES locker(lockerId),
     FOREIGN KEY (currLockerId) REFERENCES locker(lockerId),	

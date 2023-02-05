@@ -56,7 +56,8 @@ html {
     right: 10px;
 }
 
-.button {
+.lowerbutton {
+    padding: 10px;
     height: 50px;
     width: 50px;
     cursor: pointer;

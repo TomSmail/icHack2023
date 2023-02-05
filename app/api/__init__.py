@@ -98,8 +98,6 @@ async def estimatedDeliveryTime():
     ### journeys = [Journey]
     ### nodes = [Nodes]
 
-
-
     g = Graph()
 
     arcs = getArcs(journeys, nodes)

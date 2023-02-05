@@ -120,7 +120,11 @@ html {
 
 
 .imgcontainer {
-    width: 20%;
+    padding-top: 6px;
+    width: 10vh;
+    height: 10vh;
+    object-fit: cover;
+
 
 }
 

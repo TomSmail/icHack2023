@@ -67,8 +67,8 @@ INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.4507, -0.1246
 INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.5114, -0.1921);
 INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.5052, -0.1521);
 
-INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.6114, -0.1421);
-INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.6052, -0.1621);
+INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.5220, -0.1421);
+INSERT INTO locker( capacity, latitude, longitude) VALUES (200, 51.5200, -0.1621);
 
 
 INSERT INTO distributor ( balance, username, pfpUrl, failedDeliveries, succeededDeliveries)

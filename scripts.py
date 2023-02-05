@@ -37,7 +37,7 @@ def cli():
 
 
 @cli.command()
-def clean():
+def reset():
     asyncio.run(clear())
     asyncio.run(initialize())
 

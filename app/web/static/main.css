@@ -75,7 +75,6 @@ html {
 #secondary {
     width: 50%;
     max-width: 400px;
-    padding: 5%;
     box-sizing: border-box;
     border-left: 1px solid rgb(72, 72, 72);
 }
@@ -90,6 +89,7 @@ html {
 @media (max-width:480px) {
     #secondary {
         height: 90%;
+        width: 100%;
     }
 }
 
@@ -114,6 +114,9 @@ html {
     display: flex;
     flex-direction: row;
     padding-bottom: 20px;
+    border-bottom: 1px solid black;
+    border-top: 1px solid black;
+    padding: 10px 20px;
 }
 
 

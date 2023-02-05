@@ -6,22 +6,14 @@ function buildDummy() {
 
 function profileButton(name, balance, profilePicUrl) {
 
-    var elem = document.createElement('div');
-    var container = document.getElementById('name');
-    container.appendChild(elem);
+    var elem = document.getElementById('name');
     elem.innerHTML = name;
 
-    var elem2 = document.createElement('div');
-    var container2 = document.getElementById('balance');
-    container2.appendChild(elem2);
+    var elem2 = document.getElementById('balance');
     elem2.innerHTML = balance;
 
-    var elem3 = document.createElement('div');
-    var container3 = document.getElementById('imgcontainer');
-    const img = document.createElement('img');
+    var img = document.getElementById('imgcontainer');
     img.src = profilePicUrl;
-    elem3.appendChild(img);
-    container3.appendChild(elem3);
-    
+
     //document.getElementById("profile").insertAdjacentElement('beforeBegin', node);
 }

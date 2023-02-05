@@ -56,7 +56,7 @@ html {
     right: 10px;
 }
 
-.flipbutton {
+.button {
     height: 50px;
     width: 50px;
     cursor: pointer;
@@ -97,6 +97,7 @@ html {
     #secondary.hidden {
         width: 0% !important;
         display: none;
+        Ff
     }
 }
 

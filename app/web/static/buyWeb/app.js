@@ -28,10 +28,10 @@ async function buy() {
 }
 
 
-async function getapi(url) {
+async function getapi() {
     
     // Storing response
-    const response = await fetch(url + '/api/producer/locker/estimate?' + new URLSearchParams({
+    const response = await fetch( '/api/producer/locker/estimate?' + new URLSearchParams({
         start_locker: 1,
         end_locker: 5,
     }));
@@ -41,6 +41,6 @@ async function getapi(url) {
     document.getElementById("html_delivery_time").textContent = data.deliveryTime;    
 }
 // Calling that async function
-getapi(api_url);
+getapi();
 
 

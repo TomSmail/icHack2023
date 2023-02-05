@@ -1,20 +1,20 @@
 // loads map on page load
-window.onload = buildMap();
 
 // INSERT BACKEND URL
 var backEndUrl = "";
 
-
 // adds tile layers
-function buildMap() {
-    var map = L.map('map').setView([51.505, -0.09], 13);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    }).addTo(map);
-    buildDummy(map);
-    //getDropOffBoxes(map);
-}
+var map = L.map('map')
+
+map.setView([51.505, -0.09], 13);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+}).addTo(map);
+buildDummy(map);
+//getDropOffBoxes(map);
+
+
 
 // GET requesets
 async function getDropOffBoxes(map) {
@@ -28,12 +28,28 @@ async function getDropOffBoxes(map) {
     buildLocations(pointList, [], map);
 }
 
+async function getUserNameAndPFP() {
+    const response = await fetch(backEndUrl + '/user/info');
+    return [response.json().balance, response.json().pfpUrl]
+}
+// // async function createNewUser(userName, pfpUrl) {
+//     const response = await fetch(backEndUrl + '/user/create');
+// >>>>>>> q3
+// }
+
+// POST requests
+//CHANGE THIS ENDPOINT SO THAT IT ADDS the pfp url and sends it correctly
 async function createNewUser(userName, pfpUrl) {
-    const response = await fetch(backEndUrl + '/user/create');
+    const response = await fetch(backEndUrl + '/user/create',
+        {
+            method: 'POST',
+            body: `{
+       "pfpUrl": $pfpUrl,
+       "userName": $userName,
+    }`
+        });
 
 }
-
-
 
 function buildLocations(circleData, pointData, map) {
     for (let i = 0; i < circleData.length; i++) {
@@ -95,13 +111,18 @@ function flip() {
     if (!flipped) {
         console.log("shrink")
 
-        elem.style.width = "0px";
+        elem.style.width = "0%";
+        elem.style.padding = "0%";
+
     } else {
         console.log("expand")
         elem.style.width = "50%";
+
+        elem.style.padding = "5%";
     }
-    flipped = !flipped
+    flipped = !flipped;
     map.invalidateSize();
+
 
     document.getElementById("secondary").style.width = "0px";
 

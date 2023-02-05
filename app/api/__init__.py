@@ -53,8 +53,8 @@ async def setParcelAsLost():
 async def placeParcelOnArrival():
     parcel_id = (await request.get_json())["id"]
     locker_id = (await request.get_json())["locker_id"]
-    print(parcel_id)
-    print(locker_id)
+    # print(parcel_id)
+    # print(locker_id)
     user_id = (await current_app.db.fetchrow("SELECT routeEvent.userDoing FROM route JOIN routeEvent ON route.routeId = routeEvent.routeId WHERE route.parcelId=$1 and routeEvent.nextLockerId=$2;", parcel_id, locker_id))["userDoing"]
     async with current_app.db.acquire() as conn:
         final_dest = (await conn.fetchrow("SELECT destinationLocker FROM parcel WHERE parcelId=$1", parcel_id))["destinationLocker"]
@@ -124,6 +124,9 @@ async def dbBuildGraph():
     g = Graph()
 
     arcs = getArcs(journeySegments, nodes)
+    print("before")
+    print(arcs)
+    print("after")
 
     g.build_graph(arcs)
 
@@ -155,41 +158,36 @@ async def createNewParcel():
 
     start_locker_id = (await request.get_json())["start_locker"]
     end_locker_id = (await request.get_json())["end_locker"]
+    print(type(end_locker_id))
     current_time = datetime.now()
 
     g = await dbBuildGraph()
-    print("hop edges")
-    print(g.edges)
 
     best, path = route_parcel(start_locker_id, end_locker_id, current_time, g)
     async with current_app.db.acquire() as conn:
         parcel_id = await conn.fetchval("INSERT INTO parcel (dateIntoSystem, dateIntoLocker, lockerIn, destinationLocker, inTransit) VALUES ($1, $2, $3, $4, $5) RETURNING parcelId", current_time, current_time, start_locker_id, end_locker_id, False)
         route_id = await conn.fetchval("INSERT INTO route (parcelId) VALUES ($1) RETURNING routeId", parcel_id)
 
-    print("hoppp")
-    print(path)
     for (start_id, end_id, dep_time, arr_time, user_id, journeyPointStartId, journeyPointEndId) in path:
         async with current_app.db.acquire() as conn:
             await conn.execute("INSERT INTO routeEvent (leaveTime, arrivalTime, currLockerId, nextLockerId, routeId, parcelId, userDoing, journeyPointStartId, journeyPointEndId) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)", dep_time, arr_time, start_id, end_id, route_id, parcel_id, user_id, journeyPointStartId.id, journeyPointEndId.id)
 
-    return "{\"deliveryTime\": \"" + best.strftime("%d/%m/%Y, %H:%M:")+"\"}", 200
+    return "{\"deliveryTime\": \"" + best.strftime("%d/%m/%Y, %H:%M:%S")+"\"}", 200
 
 # GET - estimated delivery time from a given start locker
 
 
 @producerbp.route('/locker/estimate', methods=["GET"])
 async def estimatedDeliveryTime():
-    start_locker_id = request.args.get("start_locker")
-    end_locker_id = request.args.get("end_locker")
+    start_locker_id = int(request.args.get("start_locker"))
+    end_locker_id = int(request.args.get("end_locker"))
     current_time = datetime.now()
 
     g = await dbBuildGraph()
-    print("h2op edges")
-    print(g.edges)
 
     best, path = route_parcel(start_locker_id, end_locker_id, current_time, g)
 
-    return "{\"deliveryTime\": \"" + best.strftime("%d/%m/%Y, %H:%M:")+"\"}", 200
+    return "{\"deliveryTime\": \"" + best.strftime("%d/%m/%Y, %H:%M:%S")+"\"}", 200
 
 
 # For Distribution Front End
@@ -200,10 +198,10 @@ async def estimatedDeliveryTime():
 async def getRoutePart():
 
     route_part_id = int(request.args.get("route_part_id"))
-    print(route_part_id)
+    # print(route_part_id)
     async with current_app.db.acquire() as conn:
         rowReturned = await conn.fetchrow("SELECT (currLockerId, nextLockerId, parcelId, journeyPointStartId, journeyPointEndId) FROM routeEvent WHERE routeEventId = $1;", route_part_id)
-        print(rowReturned)
+        # print(rowReturned)
 
         startLocker = await conn.fetchrow("SELECT (latitude, longitude) FROM locker WHERE lockerId = $1;", rowReturned["row"][0])
         endLocker = await conn.fetchrow("SELECT (latitude, longitude) FROM locker WHERE lockerId = $1;", rowReturned["row"][1])
@@ -259,13 +257,13 @@ async def getUserRoutes():
 
 @distributorbp.route('/journey/add', methods=["POST"])
 async def addNewJourney():
-    print(await request.get_data())
+    # print(await request.get_data())
     distributor_id = int((await request.get_json())["distributor_id"])
     journey_points = (await request.get_json())["journey_points"]
     async with current_app.db.acquire() as conn:
 
         journey_id = await conn.fetchval("INSERT INTO journey(distributorId) VALUES ($1) RETURNING journeyId;", distributor_id)
-    print(journey_id)
+    # print(journey_id)
     for i, point in enumerate(journey_points):
         async with current_app.db.acquire() as conn:
 
@@ -286,7 +284,7 @@ async def getUserInfo():
     async with current_app.db.acquire() as conn:
 
         rowReturned = await conn.fetchrow("SELECT (balance, username, pfpUrl, failedDeliveries, succeededDeliveries) FROM distributor WHERE distributorId=$1;", user_id)
-    print(rowReturned)
+    # print(rowReturned)
     result = {
         "username": rowReturned["row"][1],
         "balance": float(rowReturned["row"][0]),
@@ -306,7 +304,7 @@ async def getLockerLocations():
         lockerRows = await conn.fetch("SELECT (latitude, longitude, lockerId) FROM locker;")
     nodes = []
     for row in lockerRows:
-        print(row["row"])
+        # print(row["row"])
         nodes.append(
             {"latitude": row["row"][0], "longitude": row["row"][1], "id": row["row"][2]})
 
@@ -321,7 +319,7 @@ async def usernameToUserId():
     async with current_app.db.acquire() as conn:
 
         rowReturned = await conn.fetchrow("SELECT distributorId FROM distributor WHERE username = $1", username)
-    print(rowReturned)
+    # print(rowReturned)
     return dumps({"user_id": rowReturned["distributorid"]}), 200
 
 

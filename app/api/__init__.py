@@ -28,7 +28,7 @@ async def index():
 async def extractParcelFromLocker():
     parcel_id = request.get_json()["id"]
     await current_app.db.execute("UPDATE TABLE parcel SET inTransit = true WHERE parcelId=$1;", parcel_id)
-    return "{'status': 'Success'}", 200
+    return "{\"status\": \"success\"}", 200
 
 # POST - set lost and update balance.
 # pass in the current locker
@@ -43,7 +43,7 @@ async def setParcelAsLost():
     user_id = await current_app.db.fetchrow("SELECT userDoing FROM route JOIN routeEvent ON route.routeId = routeEvent.routeId WHERE route(parcelId)=$1 and routeEvent(currLockerId)=$2;", parcel_id, start_locker_id)["userDoing"]
     await current_app.db.execute("UPDATE distributor SET balance = balance - $1, failedDeliveries = failedDeliveries + 1 WHERE distributorId=$2;", FAIL_PENALTY, user_id)
 
-    return "{'status': 'Success'}", 200
+    return "{\"status\": \"success\"}", 200
 
 # POST - credit user on arrival at locker
 # pass locker in which it got placed.
@@ -132,7 +132,7 @@ async def createLocker():
     longitude = request.get_json()["longitude"]
     await current_app.db.execute("INSERT INTO locker (capacity, latitude, longitude) VALUES ($1, $2, $3);", capacity, latitude, longitude)
 
-    return "{'status': 'Success'}", 200
+    return "{\"status\": \"success\"}", 200
 
 
 
@@ -162,8 +162,22 @@ async def createNewParcel():
     for (start_id, end_id, dep_time, arr_time, user_id, journeyPointStartId, journeyPointEndId) in path:
         await current_app.db.execute("INSERT INTO routeEvent (leaveTime, arrivalTime, currLockerId, nextLockerId, routeId, parcelId, userDoing, journeyPointStartId, journeyPointEndId) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)", dep_time, arr_time, start_id, end_id, route_id, parcel_id, user_id, journeyPointStartId.id, journeyPointEndId.id)
 
-    return "{'deliveryTime': '" + best.strftime("%d/%m/%Y, %H:%M:")+"'}", 200
+    return "{\"deliveryTime\": \"" + best.strftime("%d/%m/%Y, %H:%M:")+"\"}", 200
 
+# GET - estimated delivery time from a given start locker
+@producerbp.route('/locker/estimate', methods = ["GET"])
+async def estimatedDeliveryTime():
+    start_locker_id = request.args.get("start_locker")
+    end_locker_id = request.args.get("end_locker")
+    current_time = datetime.now()
+
+    g = await dbBuildGraph()
+    print("h2op edges")
+    print(g.edges)
+
+    best, path = route_parcel(start_locker_id, end_locker_id, current_time, g)
+
+    return "{\"deliveryTime\": \"" + best.strftime("%d/%m/%Y, %H:%M:")+"\"}", 200
 
 
 # For Distribution Front End
@@ -178,13 +192,31 @@ async def getRoutePart():
     rowReturned = await current_app.db.fetchrow("SELECT (currLockerId, nextLockerId, parcelId, journeyPointStartId, journeyPointEndId) FROM routeEvent WHERE routeEventId = $1;", route_part_id)
     print(rowReturned)
 
+    startLocker = await current_app.db.fetchrow("SELECT (latitude, longitude) FROM locker WHERE lockerId = $1;", rowReturned["row"][0])
+    endLocker = await current_app.db.fetchrow("SELECT (latitude, longitude) FROM locker WHERE lockerId = $1;", rowReturned["row"][1])
+
+    startPosn = await current_app.db.fetchrow("SELECT (latitude, longitude) FROM locker WHERE lockerId = $1;", rowReturned["row"][3])
+    endPosn = await current_app.db.fetchrow("SELECT (latitude, longitude) FROM locker WHERE lockerId = $1;", rowReturned["row"][4])
+
 # RETURN COORDS.
     result = {
-        "startLocker": rowReturned["row"][0],
-        "endLocker": rowReturned["row"][1],
+        "startLocker": {
+            "lat": startLocker["row"][0],
+            "lon": startLocker["row"][1]
+        },     
+        "endLocker": {
+            "lat": endLocker["row"][0],
+            "lon": endLocker["row"][1]
+        },
         "parcelId": rowReturned["row"][2],
-        "startPos": rowReturned["row"][3],
-        "endPos": rowReturned["row"][4]
+        "startPos": {
+            "lat": startPosn["row"][0],
+            "lon": startPosn["row"][1]
+        },
+        "endPos": {
+            "lat": endPosn["row"][0],
+            "lon": endPosn["row"][1]
+        }
     }
     return dumps(result), 200
 
@@ -201,19 +233,6 @@ async def getUserRoutes():
 
 
 
-
-# GET - estimated delivery time from a given start locker
-@producerbp.route('/locker/estimate', methods = ["GET"])
-async def estimatedDeliveryTime():
-    start_locker_id = request.args.get("start_locker")
-    end_locker_id = request.args.get("end_locker")
-    current_time = datetime.now()
-
-    g = await dbBuildGraph()
-    best, path = route_parcel(start_locker_id, end_locker_id, current_time, g)
-
-    return "{'deliveryTime': '" + best.strftime("%d/%m/%Y, %H:%M:")+"'}", 200
-
 # # POST - create a user account
 # @distributorbp.route('/user/create', methods = ["POST"])
 # async def createNewUserAccount():
@@ -222,7 +241,7 @@ async def estimatedDeliveryTime():
 #     pfpUrl = request.get_json()["pfpUrl"]
 #     await current_app.db.execute("INSERT INTO user (username, pfpUrl) VALUES ($1, $2);", username, pfpUrl)
         
-#     return "{'status': 'Success'}", 200
+#     return "{\"status\": \"Success\"}", 200
 
 # POST - add a journey
 
@@ -240,7 +259,7 @@ async def addNewJourney():
              datetime.strptime(point["arrival_time"], '%Y-%m-%d %H:%M:%S')
        )
 
-    return "{'status': 'Success'}", 200
+    return "{\"status\": \"success\"}", 200
 
 # GET - user's balance and PFP
 

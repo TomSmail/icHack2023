@@ -3,6 +3,29 @@ flipped = false;
 
 var map = L.map('map')
 
+var greenIcon = L.icon({
+    iconUrl: 'marker-icon-green.png',
+    shadowUrl: 'leaf-shadow.png',
+
+    iconSize: [38, 95], // size of the icon
+    shadowSize: [50, 64], // size of the shadow
+    iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+    shadowAnchor: [4, 62],  // the same for the shadow
+    popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+
+var redIcon = L.icon({
+    iconUrl: 'marker-icon-red.png',
+    shadowUrl: 'leaf-shadow.png',
+
+    iconSize: [38, 95], // size of the icon
+    shadowSize: [50, 64], // size of the shadow
+    iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+    shadowAnchor: [4, 62],  // the same for the shadow
+    popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+
+
 map.setView([51.505, -0.09], 13);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
@@ -27,38 +50,38 @@ async function loadcode() {
                 });
             })
         .catch(err => console.log('Fetch Error :-S', err));
+    getroute()
+}
 
+setInterval(function () {
+    getroute()
+}, 4000);
+
+function getroute() {
     fetch('api/distributor/user/get_route_parts')
         .then(
             response => {
                 if (response.status !== 200) {
                     console.log('ERRNO: ' + response.status);
-                    if (response.status == 500) {
-                        //document.location.href = "/login"
-                    }
                     return;
                 }
-
-                // Examine the text in the response
                 response.json().then(function (data) {
-                    displayUserRoutes(data["routes"])
+                    //console.log("refreshing routes")
+                    //routes = [12, 43, 432, 321]
+                    document.getElementById("routes").innerHTML = "";
+                    for (var i = 0; i < data["routes"].length; i++) {
+                        const elem = document.createElement('div');
+
+                        elem.setAttribute("id", data["routes"][i]);
+                        elem.setAttribute("class", "route");
+                        elem.setAttribute("onclick", "selectRoute(this)");
+                        elem.innerHTML = "<h3>Route number: " + (i + 1) + "</h3>"
+                        document.getElementById('routes').appendChild(elem);
+                    }
+
                 });
             })
         .catch(err => console.log('Fetch Error :-S', err));
-
-}
-
-function displayUserRoutes(routes) {
-    //routes = [12, 43, 432, 321]
-    for (var i = 0; i < routes.length; i++) {
-        const elem = document.createElement('div');
-
-        elem.setAttribute("id", routes[i]);
-        elem.setAttribute("class", "route");
-        elem.setAttribute("onclick", "selectRoute(this)");
-        elem.innerHTML = "<h3>Route num: " + (i + 1) + "</h3>"
-        document.getElementById('routes').appendChild(elem);
-    }
 }
 
 collection = []
@@ -96,8 +119,8 @@ function selectRoute(elem) {
                     map.setView([(data.startPos["lat"] + data.endPos["lat"]) / 2, (data.startPos["lon"] + data.endPos["lon"]) / 2], 13);
 
 
-                    var startmarker = L.marker([data.startPos.lat, data.startPos.lon]);
-                    var endmarker = L.marker([data.endPos.lat, data.endPos.lon]);
+                    var startmarker = L.marker([data.startPos.lat, data.startPos.lon], { icon: greenIcon });
+                    var endmarker = L.marker([data.endPos.lat, data.endPos.lon], { icon: redIcon });
 
                     var startlocker = L.marker([data.startLocker.lat, data.startLocker.lon]);
                     var endlocker = L.marker([data.endLocker.lat, data.endLocker.lon]);
@@ -173,20 +196,8 @@ function flip() {
 
 
 
-// loead sw
-
-window.addEventListener('load', () => {
-    if (!('serviceWorker' in navigator)) {
-        // service workers not supported 😣
-        return
+window.addEventListener("load", () => {
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js");
     }
-
-    navigator.serviceWorker.register('/sw.js').then(
-        () => {
-            console.log("reg")
-        },
-        err => {
-            console.error('reg fail', err)
-        }
-    )
-})
+});

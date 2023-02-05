@@ -28,10 +28,13 @@ async function getDropOffBoxes(map) {
     buildLocations(pointList, [], map);
 }
 
-async function getUserNameAndPFP() {
+// response.json().
+// "username" "balance" "pfpUrl" "failedDeliveries" "succeededDeliveries"
+async function getUserInfo() {
     const response = await fetch(backEndUrl + '/user/info');
-    return [response.json().balance, response.json().pfpUrl]
+    return response.json();
 }
+
 // // async function createNewUser(userName, pfpUrl) {
 //     const response = await fetch(backEndUrl + '/user/create');
 // >>>>>>> q3
@@ -43,12 +46,22 @@ async function createNewUser(userName, pfpUrl) {
     const response = await fetch(backEndUrl + '/user/create',
         {
             method: 'POST',
-            body: `{
-       "pfpUrl": $pfpUrl,
-       "userName": $userName,
-    }`
-        });
+            body: {
+                "pfpUrl": pfpUrl,
+                "username": userName,
+        }
+    });
+}
 
+async function usernameToUserId(userName) {
+    const response = await fetch(backEndUrl + '/user/create',
+        {
+            method: 'POST',
+            body: {
+                "username": userName,
+    }
+        });
+        return response.json().username
 }
 
 function buildLocations(circleData, pointData, map) {

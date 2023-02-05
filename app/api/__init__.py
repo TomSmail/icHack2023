@@ -223,7 +223,8 @@ async def addNewJourney():
 
 @distributorbp.route('/user/info', methods=["GET"])
 async def getUserInfo():
-    user_id = int(request.args.get("user_id"))
+    # user_id = int(request.args.get("user_id"))
+    user_id = int(request.cookies.get("userid"))
 
     rowReturned = await current_app.db.fetchrow("SELECT (balance, username, pfpUrl, failedDeliveries, succeededDeliveries) FROM distributor WHERE distributorId=$1;", user_id)
     print(rowReturned)

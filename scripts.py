@@ -13,7 +13,7 @@ async def connect():
     return await asyncpg.connect(parsed_toml["DB_CONN"])
 
 
-async def write():
+async def initialize():
     conn = await connect()
     with open('sql/schema.sql', 'r') as f:
         await conn.execute(f.read())
@@ -25,21 +25,29 @@ async def clear():
         await conn.execute(f.read())
 
 
+async def seed():
+    conn = await connect()
+    with open('sql/seed.sql', 'r') as f:
+        await conn.execute(f.read())
+
+
 @click.group()
 def cli():
     pass
 
 
 @cli.command()
-def init():
-    asyncio.run(write())
+def reset():
+    asyncio.run(clear())
+    asyncio.run(initialize())
+
     click.echo('Initialized the database')
 
 
 @cli.command()
-def drop():
-    asyncio.run(clear())
-    click.echo('Dropped the database')
+def seed():
+    asyncio.run(seed())
+    click.echo('seed ')
 
 
 if __name__ == '__main__':

@@ -43,10 +43,11 @@ html {
     right: 10px;
 }
 
-.button {
+.flipbutton {
     height: 40px;
     width: 40px;
     background: black;
+    cursor: pointer;
 }
 
 #map .leaflet-tile-pane {
@@ -58,7 +59,7 @@ html {
     filter: gray;
 }
 
-.secondary {
+#secondary {
     width: 50%;
     padding: 5%;
     box-sizing: border-box;
@@ -77,22 +78,6 @@ html {
 }
 
 .profileinfo {
+    padding-left: 10px;
     flex-grow: 1;
 }
-
-
-
-
-.profile-photo {
-    border-radius: 50%;
-}
-
-/* @media (max-width: 1000px) {
-    .primary {
-        
-    }
-    
-    .secondary {
-    
-    }
-} */

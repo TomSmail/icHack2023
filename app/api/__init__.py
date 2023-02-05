@@ -86,7 +86,7 @@ async def createNewParcel():
 # GET - Get status of a given parcel
 @producerbp.route('/parcel/status', methods = ["GET"])
 async def getParcelStatus():
-    parcel_id = request.get_json()["id"]
+    parcel_id = request.args.get()["id"]
     row_returned = await current_app.db.fetchrow("SELECT inTransit, lockerIn FROM parcel WHERE parcel(parcelId)=$1;", parcel_id)
 
     response = {}
@@ -130,8 +130,8 @@ async def dbBuildGraph():
 # GET - estimated delivery time from a given start locker
 @producerbp.route('/locker/estimate', method = ["GET"])
 async def estimatedDeliveryTime():
-    start_locker_id = request.get()["start_locker"]
-    end_locker_id = request.get()["end_locker"]
+    start_locker_id = request.args.get()["start_locker"]
+    end_locker_id = request.args.get()["end_locker"]
     current_time = datetime.now()
 
     g = dbBuildGraph()
@@ -184,10 +184,10 @@ async def addNewJourney():
 @distributorbp.route('/route/current', methods = ["GET"])
 async def getUsersRoute():
 
-    distributor_id = request.get_json()["distributor_id"]
-    start_time = request.get_json()["start_time"]
-    end_time = request.get_json()["end_time"]
-    journey_points = request.get_json()["journey_points"]
+    distributor_id = request.args.get()["distributor_id"]
+    start_time = request.args.get()["start_time"]
+    end_time = request.args.get()["end_time"]
+    journey_points = request.args.get()["journey_points"]
 
     journey_id = await current_app.db.execute("INSERT INTO journey(startTime, endTime, distributorId) VALUES ($1, $2, $3) RETURNING journeyId INTO journeyId;", start_time, end_time, distributor_id)
 
@@ -204,7 +204,7 @@ async def getUsersRoute():
 # GET - user's balance and PFP
 @distributorbp.route('/user/info', method = ["GET"])
 async def getUserInfo():
-    user_id = request.json()["user_id"]
+    user_id = request.args.get()["user_id"]
 
     rowReturned = await current_app.db.fetchrow("SELECT (balance, username, pfpUrl, failedDeliveries, succeededDeliveries) FROM distributor WHERE distributorId=$1;", user_id);
     result = {
@@ -229,7 +229,7 @@ async def getLockerLocations():
 # GET - username to user id
 @distributorbp.route('/locker/getall', methods = ["GET"])
 async def usernameToUserId():
-    username = request.json()["username"]
+    username = request.args.get()["username"]
     rowReturned = await current_app.db.fetchrow("SELECT distributorId FROM distributor WHERE username = $1", username)
     return dumps({"username" : rowReturned["username"]}), 200
 

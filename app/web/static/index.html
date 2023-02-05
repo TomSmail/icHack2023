@@ -14,9 +14,6 @@
     <!-- Leaflet Javascript (needs to be after css) -->
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
         integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
-    
-    <script src="app.js"></script>
-    <script src="serviceworker.js" type="text/javascript" ></script>
 
     <!-- link to javascript, requires defer to load js after "map" initialised-->
     <script src="mapping.js" defer></script>
@@ -41,7 +38,7 @@
         <div id="secondary">
             <div class="profile">
                 <div class="imgcontainer">
-                    <img id="imgcontainer" width="100%" height="100%" style="border-radius: 50%;">
+                    <img id="imgcontainer" width="100%" height="100%" style="border-radius: 50%;   object-fit: cover;">
                 </div>
                 <div class="profileinfo">
                     <h2 id="name">Loading... </h2>

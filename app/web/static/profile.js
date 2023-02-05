@@ -1,12 +1,37 @@
 window.onload = getprofiledata();
 
-function getprofiledata() {
-    profileButton("Bob Ross", "420.69", "./bobross.jpeg")
-    if (document.cookie.indexOf("userid=") < 0) {
 
-        window.location.href = "/login";
+async function getprofiledata() {
 
-    }
+
+    resp = await fetch('api/distributor/user/info')
+
+    console.log(resp)
+
+
+    fetch('api/distributor/user/info')
+        .then(
+            response => {
+                if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                        response.status);
+                    return;
+                }
+
+                // Examine the text in the response
+                response.json().then(function (data) {
+                    console.log(data);
+                    profileButton(data["username"], data["balance"], data["pfpUrl"])
+
+                });
+            })
+        .catch(err => console.log('Fetch Error :-S', err));
+
+
+
+
+
+
 
 }
 

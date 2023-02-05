@@ -16,6 +16,7 @@ apibp.register_blueprint(distributorbp)
 
 FAIL_PENALTY = 5.00
 
+
 @apibp.route('/')
 async def index():
     return "Hello World", 200, {'X-Header': 'Value'}
@@ -23,15 +24,17 @@ async def index():
 
 # For Amazon
 # POST - pull parcel out of locker - move to in transit.
-@producerbp.route('/parcel/extract', methods = ["POST"])
+@producerbp.route('/parcel/extract', methods=["POST"])
 async def extractParcelFromLocker():
     parcel_id = request.get_json()["id"]
-    await current_app.db.execute("UPDATE TABLE parcel SET inTransit = true WHERE parcelId=$1;", parcel_id)       
+    await current_app.db.execute("UPDATE TABLE parcel SET inTransit = true WHERE parcelId=$1;", parcel_id)
     return "{'status': 'Success'}", 200
 
 # POST - set lost and update balance.
 # pass in the current locker
-@producerbp.route('/parcel/setlost', methods = ["POST"])
+
+
+@producerbp.route('/parcel/setlost', methods=["POST"])
 async def setParcelAsLost():
     parcel_id = request.get_json()["parcel_id"]
     start_locker_id = request.get_json()["start_locker"]
@@ -44,7 +47,9 @@ async def setParcelAsLost():
 
 # POST - credit user on arrival at locker
 # pass locker in which it got placed.
-@producerbp.route('/parcel/deposit', methods = ["POST"])
+
+
+@producerbp.route('/parcel/deposit', methods=["POST"])
 async def placeParcelOnArrival():
     parcel_id = (await request.get_json())["id"]
     locker_id = (await request.get_json())["locker_id"]
@@ -66,7 +71,9 @@ async def placeParcelOnArrival():
     return "{'status': 'Success'}", 200
 
 # POST - Add a new parcel into the system
-@producerbp.route('/parcel/create', methods = ["POST"])
+
+
+@producerbp.route('/parcel/create', methods=["POST"])
 async def createNewParcel():
     # Create a new parcel row with the data as provided by the user.
 
@@ -86,7 +93,9 @@ async def createNewParcel():
     return "{'deliveryTime': '" + best.strftime("%d/%m/%Y, %H:%M:")+"'}", 200
 
 # GET - Get status of a given parcel
-@producerbp.route('/parcel/status', methods = ["GET"])
+
+
+@producerbp.route('/parcel/status', methods=["GET"])
 async def getParcelStatus():
     parcel_id = request.args.get()["id"]
     row_returned = await current_app.db.fetchrow("SELECT inTransit, lockerIn FROM parcel WHERE parcel(parcelId)=$1;", parcel_id)
@@ -99,7 +108,7 @@ async def getParcelStatus():
     else:
         response["in_transit"] = False
         response["locker_in"] = row_returned["lockerIn"]
-    
+
     return dumps(response), 200
 
 
@@ -108,19 +117,21 @@ async def dbBuildGraph():
     journeySegments = []
     for journey in journeyRows:
         journeyPoints = await current_app.db.fetch("SELECT (arrivalTime, latitude, longitude) FROM journeyPoint WHERE journeyId = $1 ORDER BY ordinalNumber;", journey["journeyId"])
-        for i,pt in enumerate(journeyPoints[:-1]):
+        for i, pt in enumerate(journeyPoints[:-1]):
             journeySegments.append(Journey(
-                pt["arrivalTime"], journeyPoints[i+1]["arrivalTime"], 
+                pt["arrivalTime"], journeyPoints[i+1]["arrivalTime"],
                 Point(pt["latitude"], pt["longitude"]),
-                Point(journeyPoints[i+1]["latitude"], journeyPoints[i+1]["longitude"]),
+                Point(journeyPoints[i+1]["latitude"],
+                      journeyPoints[i+1]["longitude"]),
                 journey["distributorId"]
             ))
-    
+
     lockerRows = await current_app.db.fetch("SELECT (latitude, longitude, lockerId) FROM locker;")
     nodes = []
     for row in lockerRows:
-        nodes.append(Node(Point(row["latitude"], row["longitude"]), row["lockerId"]))
-        
+        nodes.append(
+            Node(Point(row["latitude"], row["longitude"]), row["lockerId"]))
+
     g = Graph()
 
     arcs = getArcs(journeySegments, nodes)
@@ -130,7 +141,9 @@ async def dbBuildGraph():
     return g
 
 # GET - estimated delivery time from a given start locker
-@producerbp.route('/locker/estimate', methods = ["GET"])
+
+
+@producerbp.route('/locker/estimate', methods=["GET"])
 async def estimatedDeliveryTime():
     start_locker_id = request.args.get("start_locker")
     end_locker_id = request.args.get("end_locker")
@@ -142,7 +155,9 @@ async def estimatedDeliveryTime():
     return "{'deliveryTime': '" + best.strftime("%d/%m/%Y, %H:%M:")+"'}", 200
 
 # POST - Add a new locker at a given location
-@producerbp.route('/locker/create', methods = ["POST"])
+
+
+@producerbp.route('/locker/create', methods=["POST"])
 async def createLocker():
     # Add a value to the database for a new locker
 
@@ -150,16 +165,15 @@ async def createLocker():
     latitude = request.get_json()["latitude"]
     longitude = request.get_json()["longitude"]
     await current_app.db.execute("INSERT INTO locker (capacity, latitude, longitude) VALUES ($1, $2, $3);", capacity, latitude, longitude)
-    
-    return "{'status': 'Success'}", 200
 
+    return "{'status': 'Success'}", 200
 
 
 # For Distribution Front End
 
 # GET - user's journey and start and end locker locations, and like a way of identifying the parcel.
 # provide route event id
-@distributorbp.route('/route_part/get', methods = ["GET"])
+@distributorbp.route('/route_part/get', methods=["GET"])
 async def getUsersRoute():
 
     route_part_id = request.args.get("route_part_id")
@@ -169,72 +183,83 @@ async def getUsersRoute():
     result = {
         "startLockerId": rowReturned["currLockerId"],
         "endLockerId": rowReturned["nextLockerId"],
-        "parcelId": rowReturned["parcelId"]        
+        "parcelId": rowReturned["parcelId"]
     }
     return dumps(result), 200
 
 # POST - create a user account
-@distributorbp.route('/user/create', methods = ["POST"])
+
+
+@distributorbp.route('/user/create', methods=["POST"])
 async def createNewUserAccount():
     # create user with the required data
     username = request.get_json()["capacity"]
     pfpUrl = request.get_json()["pfpUrl"]
     await current_app.db.execute("INSERT INTO user (username, pfpUrl) VALUES ($1, $2);", username, pfpUrl)
-        
+
     return "{'status': 'Success'}", 200
 
 # POST - add a journey
-@distributorbp.route('/journey/add', methods = ["POST"])
+
+
+@distributorbp.route('/journey/add', methods=["POST"])
 async def addNewJourney():
     print(await request.get_data())
-    distributor_id = (await request.get_json())["distributor_id"]
-    start_time =  datetime.strptime((await request.get_json())["start_time"], '%Y-%m-%d %H:%M:%S')
-    end_time = datetime.strptime((await request.get_json()["end_time"], '%Y-%m-%d %H:%M:%S'))
+    distributor_id = int((await request.get_json())["distributor_id"])
     journey_points = (await request.get_json())["journey_points"]
 
-    journey_id = await current_app.db.execute("INSERT INTO journey(startTime, endTime, distributorId) VALUES ($1, $2, $3) RETURNING journeyId INTO journeyId;", start_time, end_time, distributor_id)
+    journey_id = await current_app.db.fetchval("INSERT INTO journey(distributorId) VALUES ($1) RETURNING journeyId;", distributor_id)
 
-    await gather(*[
-        current_app.db.execute("INSERT INTO journeyPoint(latitude, longitude, ordinalNumber, journeyId) VALUES ($1, $2, $3, $4);", point["latitude"], point["longitude"], i, journey_id)
-        for i, point in enumerate(journey_points)
-    ])        
+    for i, point in enumerate(journey_points):
+        await current_app.db.execute("INSERT INTO journeyPoint(latitude, longitude, ordinalNumber, journeyId, arrivalTime) VALUES ($1, $2, $3, $4, $5);", point["latitude"], point["longitude"], i, journey_id,
+                                     datetime.strptime(
+                                         point["arrival_time"], '%Y-%m-%d %H:%M:%S')
+                                     )
 
     return "{'status': 'Success'}", 200
 
 # GET - user's balance and PFP
-@distributorbp.route('/user/info', methods = ["GET"])
-async def getUserInfo():
-    user_id = int(request.args.get("user_id"))
 
-    rowReturned = await current_app.db.fetchrow("SELECT (balance, username, pfpUrl, failedDeliveries, succeededDeliveries) FROM distributor WHERE distributorId=$1;", user_id);
+
+@distributorbp.route('/user/info', methods=["GET"])
+async def getUserInfo():
+    # user_id = int(request.args.get("user_id"))
+    user_id = int(request.cookies.get("userid"))
+
+    rowReturned = await current_app.db.fetchrow("SELECT (balance, username, pfpUrl, failedDeliveries, succeededDeliveries) FROM distributor WHERE distributorId=$1;", user_id)
     print(rowReturned)
     result = {
-        "username" : rowReturned["row"][1],
-        "balance" : float(rowReturned["row"][0]),
-        "pfpUrl" : rowReturned["row"][2],
-        "failedDeliveries" : rowReturned["row"][3],
-        "succeededDeliveries" : rowReturned["row"][4] 
+        "username": rowReturned["row"][1],
+        "balance": float(rowReturned["row"][0]),
+        "pfpUrl": rowReturned["row"][2],
+        "failedDeliveries": rowReturned["row"][3],
+        "succeededDeliveries": rowReturned["row"][4]
     }
     return dumps(result), 200,
 
 # GET - locker locations
-@distributorbp.route('/locker/getall', methods = ["GET"])
+
+
+@distributorbp.route('/locker/getall', methods=["GET"])
 async def getLockerLocations():
     lockerRows = await current_app.db.fetch("SELECT (latitude, longitude, lockerId) FROM locker;")
     nodes = []
     for row in lockerRows:
         print(row["row"])
-        nodes.append( { "latitude": row["row"][0], "longitude" : row["row"][1], "id": row["row"][2] })
-    
+        nodes.append(
+            {"latitude": row["row"][0], "longitude": row["row"][1], "id": row["row"][2]})
+
     return dumps({"lockers": nodes}), 200
 
 # GET - username to user id
-@distributorbp.route('/user/getid', methods = ["GET"])
+
+
+@distributorbp.route('/user/getid', methods=["GET"])
 async def usernameToUserId():
     username = request.args.get("username")
     rowReturned = await current_app.db.fetchrow("SELECT distributorId FROM distributor WHERE username = $1", username)
     print(rowReturned)
-    return dumps({"user_id" : rowReturned["distributorid"]}), 200
+    return dumps({"user_id": rowReturned["distributorid"]}), 200
 
 
 # For the backend
@@ -258,4 +283,3 @@ async def usernameToUserId():
 #
 
 # we are gonna generate some points
-

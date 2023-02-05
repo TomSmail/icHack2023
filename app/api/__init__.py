@@ -56,17 +56,20 @@ async def placeParcelOnArrival():
     print(parcel_id)
     print(locker_id)
     user_id = (await current_app.db.fetchrow("SELECT routeEvent.userDoing FROM route JOIN routeEvent ON route.routeId = routeEvent.routeId WHERE route.parcelId=$1 and routeEvent.nextLockerId=$2;", parcel_id, locker_id))["userDoing"]
-    final_dest = (await current_app.db.fetchrow("SELECT destinationLocker FROM parcel WHERE parcelId=$1", parcel_id))["destinationLocker"]
+    async with current_app.db.acquire() as conn:
+        final_dest = (await conn.fetchrow("SELECT destinationLocker FROM parcel WHERE parcelId=$1", parcel_id))["destinationLocker"]
     current_time = datetime.now()
     await gather(user_id, final_dest)
-
-    await current_app.db.execute("UPDATE parcel SET dateIntoLocker = $1, lockerIn = $2 WHERE parcelId=$3;", current_time, locker_id, parcel_id)
+    async with current_app.db.acquire() as conn:
+        await conn.execute("UPDATE parcel SET dateIntoLocker = $1, lockerIn = $2 WHERE parcelId=$3;", current_time, locker_id, parcel_id)
 
     delivery_prize = random()
-    await current_app.db.execute("UPDATE distributor SET balance = balance + $1, succeededDeliveries = succeededDeliveries + 1 WHERE distributorId=$2;", delivery_prize, user_id)
+    async with current_app.db.acquire() as conn:
+        await conn.execute("UPDATE distributor SET balance = balance + $1, succeededDeliveries = succeededDeliveries + 1 WHERE distributorId=$2;", delivery_prize, user_id)
 
     if (locker_id == final_dest):
-        await current_app.db.execute("DELETE FROM parcel = true WHERE parcelId=$1;", parcel_id)
+        async with current_app.db.acquire() as conn:
+            await conn.execute("DELETE FROM parcel = true WHERE parcelId=$1;", parcel_id)
 
     return "{'status': 'Success'}", 200
 
@@ -76,7 +79,9 @@ async def placeParcelOnArrival():
 @producerbp.route('/parcel/status', methods=["GET"])
 async def getParcelStatus():
     parcel_id = request.args.get()["id"]
-    row_returned = await current_app.db.fetchrow("SELECT inTransit, lockerIn FROM parcel WHERE parcel(parcelId)=$1;", parcel_id)
+    async with current_app.db.acquire() as conn:
+
+        row_returned = await conn.fetchrow("SELECT inTransit, lockerIn FROM parcel WHERE parcel(parcelId)=$1;", parcel_id)
 
     response = {}
     if row_returned["inTransit"]:
@@ -91,25 +96,31 @@ async def getParcelStatus():
 
 
 async def dbBuildGraph():
-    journeyRows = await current_app.db.fetch("SELECT (journeyId, distributorId) FROM journey;")
+    async with current_app.db.acquire() as conn:
+
+        journeyRows = await conn.fetch("SELECT (journeyId, distributorId) FROM journey;")
     journeySegments = []
     today = datetime.today()
 
     for journey in journeyRows:
-        journeyPoints = await current_app.db.fetch("SELECT (arrivalTime, latitude, longitude, journeyPointId) FROM journeyPoint WHERE journeyId = $1 ORDER BY ordinalNumber;", journey["row"][0])
-        for i,pt in enumerate(journeyPoints[:-1]):
+        async with current_app.db.acquire() as conn:
+            journeyPoints = await conn.fetch("SELECT (arrivalTime, latitude, longitude, journeyPointId) FROM journeyPoint WHERE journeyId = $1 ORDER BY ordinalNumber;", journey["row"][0])
+        for i, pt in enumerate(journeyPoints[:-1]):
             journeySegments.append(Journey(
-                datetime.combine(today, pt["row"][0]), datetime.combine(today,journeyPoints[i+1]["row"][0]), 
+                datetime.combine(today, pt["row"][0]), datetime.combine(
+                    today, journeyPoints[i+1]["row"][0]),
                 Point(pt["row"][1], pt["row"][2], pt["row"][3]),
-                Point(journeyPoints[i+1]["row"][1], journeyPoints[i+1]["row"][2], pt["row"][3]),
+                Point(journeyPoints[i+1]["row"][1],
+                      journeyPoints[i+1]["row"][2], pt["row"][3]),
                 journey["row"][1]
             ))
-
-    lockerRows = await current_app.db.fetch("SELECT (latitude, longitude, lockerId) FROM locker;")
+    async with current_app.db.acquire() as conn:
+        lockerRows = await conn.fetch("SELECT (latitude, longitude, lockerId) FROM locker;")
     nodes = []
     for row in lockerRows:
-        nodes.append(Node(Point(row["row"][0], row["row"][1], None), row["row"][2]))
-        
+        nodes.append(
+            Node(Point(row["row"][0], row["row"][1], None), row["row"][2]))
+
     g = Graph()
 
     arcs = getArcs(journeySegments, nodes)
@@ -117,7 +128,6 @@ async def dbBuildGraph():
     g.build_graph(arcs)
 
     return g
-
 
 
 # POST - Add a new locker at a given location
@@ -130,11 +140,10 @@ async def createLocker():
     capacity = request.get_json()["capacity"]
     latitude = request.get_json()["latitude"]
     longitude = request.get_json()["longitude"]
-    await current_app.db.execute("INSERT INTO locker (capacity, latitude, longitude) VALUES ($1, $2, $3);", capacity, latitude, longitude)
+    async with current_app.db.acquire() as conn:
+        await conn.execute("INSERT INTO locker (capacity, latitude, longitude) VALUES ($1, $2, $3);", capacity, latitude, longitude)
 
     return "{\"status\": \"success\"}", 200
-
-
 
 
 # POST - Add a new parcel into the system
@@ -153,19 +162,22 @@ async def createNewParcel():
     print(g.edges)
 
     best, path = route_parcel(start_locker_id, end_locker_id, current_time, g)
-
-    parcel_id = await current_app.db.fetchval("INSERT INTO parcel (dateIntoSystem, dateIntoLocker, lockerIn, destinationLocker, inTransit) VALUES ($1, $2, $3, $4, $5) RETURNING parcelId", current_time, current_time, start_locker_id, end_locker_id, False)
-    route_id = await current_app.db.fetchval("INSERT INTO route (parcelId) VALUES ($1) RETURNING routeId", parcel_id)
+    async with current_app.db.acquire() as conn:
+        parcel_id = await conn.fetchval("INSERT INTO parcel (dateIntoSystem, dateIntoLocker, lockerIn, destinationLocker, inTransit) VALUES ($1, $2, $3, $4, $5) RETURNING parcelId", current_time, current_time, start_locker_id, end_locker_id, False)
+        route_id = await conn.fetchval("INSERT INTO route (parcelId) VALUES ($1) RETURNING routeId", parcel_id)
 
     print("hoppp")
     print(path)
     for (start_id, end_id, dep_time, arr_time, user_id, journeyPointStartId, journeyPointEndId) in path:
-        await current_app.db.execute("INSERT INTO routeEvent (leaveTime, arrivalTime, currLockerId, nextLockerId, routeId, parcelId, userDoing, journeyPointStartId, journeyPointEndId) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)", dep_time, arr_time, start_id, end_id, route_id, parcel_id, user_id, journeyPointStartId.id, journeyPointEndId.id)
+        async with current_app.db.acquire() as conn:
+            await conn.execute("INSERT INTO routeEvent (leaveTime, arrivalTime, currLockerId, nextLockerId, routeId, parcelId, userDoing, journeyPointStartId, journeyPointEndId) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)", dep_time, arr_time, start_id, end_id, route_id, parcel_id, user_id, journeyPointStartId.id, journeyPointEndId.id)
 
     return "{\"deliveryTime\": \"" + best.strftime("%d/%m/%Y, %H:%M:")+"\"}", 200
 
 # GET - estimated delivery time from a given start locker
-@producerbp.route('/locker/estimate', methods = ["GET"])
+
+
+@producerbp.route('/locker/estimate', methods=["GET"])
 async def estimatedDeliveryTime():
     start_locker_id = request.args.get("start_locker")
     end_locker_id = request.args.get("end_locker")
@@ -189,21 +201,22 @@ async def getRoutePart():
 
     route_part_id = int(request.args.get("route_part_id"))
     print(route_part_id)
-    rowReturned = await current_app.db.fetchrow("SELECT (currLockerId, nextLockerId, parcelId, journeyPointStartId, journeyPointEndId) FROM routeEvent WHERE routeEventId = $1;", route_part_id)
-    print(rowReturned)
+    async with current_app.db.acquire() as conn:
+        rowReturned = await conn.fetchrow("SELECT (currLockerId, nextLockerId, parcelId, journeyPointStartId, journeyPointEndId) FROM routeEvent WHERE routeEventId = $1;", route_part_id)
+        print(rowReturned)
 
-    startLocker = await current_app.db.fetchrow("SELECT (latitude, longitude) FROM locker WHERE lockerId = $1;", rowReturned["row"][0])
-    endLocker = await current_app.db.fetchrow("SELECT (latitude, longitude) FROM locker WHERE lockerId = $1;", rowReturned["row"][1])
+        startLocker = await conn.fetchrow("SELECT (latitude, longitude) FROM locker WHERE lockerId = $1;", rowReturned["row"][0])
+        endLocker = await conn.fetchrow("SELECT (latitude, longitude) FROM locker WHERE lockerId = $1;", rowReturned["row"][1])
 
-    startPosn = await current_app.db.fetchrow("SELECT (latitude, longitude) FROM locker WHERE lockerId = $1;", rowReturned["row"][3])
-    endPosn = await current_app.db.fetchrow("SELECT (latitude, longitude) FROM locker WHERE lockerId = $1;", rowReturned["row"][4])
+        startPosn = await conn.fetchrow("SELECT (latitude, longitude) FROM locker WHERE lockerId = $1;", rowReturned["row"][3])
+        endPosn = await conn.fetchrow("SELECT (latitude, longitude) FROM locker WHERE lockerId = $1;", rowReturned["row"][4])
 
 # RETURN COORDS.
     result = {
         "startLocker": {
             "lat": startLocker["row"][0],
             "lon": startLocker["row"][1]
-        },     
+        },
         "endLocker": {
             "lat": endLocker["row"][0],
             "lon": endLocker["row"][1]
@@ -221,16 +234,14 @@ async def getRoutePart():
     return dumps(result), 200
 
 
-
 @distributorbp.route('/user/get_route_parts', methods=["GET"])
 async def getUserRoutes():
     user_id = int(request.cookies.get("userid"))
+    async with current_app.db.acquire() as conn:
+        rowsReturned = await conn.fetch("SELECT * FROM routeEvent WHERE userDoing=$1;", user_id)
 
-    rowsReturned = await current_app.db.fetch("SELECT * FROM routeEvent WHERE userDoing=$1;", user_id)
-
-    result = {"routes": [*map(lambda x : x["routeeventid"], rowsReturned)]}
+    result = {"routes": [*map(lambda x: x["routeeventid"], rowsReturned)]}
     return dumps(result), 200
-
 
 
 # # POST - create a user account
@@ -240,7 +251,7 @@ async def getUserRoutes():
 #     username = request.get_json()["capacity"]
 #     pfpUrl = request.get_json()["pfpUrl"]
 #     await current_app.db.execute("INSERT INTO user (username, pfpUrl) VALUES ($1, $2);", username, pfpUrl)
-        
+
 #     return "{\"status\": \"Success\"}", 200
 
 # POST - add a journey
@@ -251,13 +262,17 @@ async def addNewJourney():
     print(await request.get_data())
     distributor_id = int((await request.get_json())["distributor_id"])
     journey_points = (await request.get_json())["journey_points"]
+    async with current_app.db.acquire() as conn:
 
-    journey_id = await current_app.db.fetchval("INSERT INTO journey(distributorId) VALUES ($1) RETURNING journeyId;", distributor_id)
+        journey_id = await conn.fetchval("INSERT INTO journey(distributorId) VALUES ($1) RETURNING journeyId;", distributor_id)
     print(journey_id)
-    for i, point in enumerate(journey_points):   
-        await current_app.db.execute("INSERT INTO journeyPoint(latitude, longitude, ordinalNumber, journeyId, arrivalTime) VALUES ($1, $2, $3, $4, $5);", point["latitude"], point["longitude"], i, journey_id, 
-             datetime.strptime(point["arrival_time"], '%Y-%m-%d %H:%M:%S')
-       )
+    for i, point in enumerate(journey_points):
+        async with current_app.db.acquire() as conn:
+
+            await conn.execute("INSERT INTO journeyPoint(latitude, longitude, ordinalNumber, journeyId, arrivalTime) VALUES ($1, $2, $3, $4, $5);", point["latitude"], point["longitude"], i, journey_id,
+                               datetime.strptime(
+                point["arrival_time"], '%Y-%m-%d %H:%M:%S')
+            )
 
     return "{\"status\": \"success\"}", 200
 
@@ -268,9 +283,9 @@ async def addNewJourney():
 async def getUserInfo():
     # user_id = int(request.args.get("user_id"))
     user_id = int(request.cookies.get("userid"))
+    async with current_app.db.acquire() as conn:
 
- 
-    rowReturned = await current_app.db.fetchrow("SELECT (balance, username, pfpUrl, failedDeliveries, succeededDeliveries) FROM distributor WHERE distributorId=$1;", user_id)
+        rowReturned = await conn.fetchrow("SELECT (balance, username, pfpUrl, failedDeliveries, succeededDeliveries) FROM distributor WHERE distributorId=$1;", user_id)
     print(rowReturned)
     result = {
         "username": rowReturned["row"][1],
@@ -286,7 +301,9 @@ async def getUserInfo():
 
 @distributorbp.route('/locker/getall', methods=["GET"])
 async def getLockerLocations():
-    lockerRows = await current_app.db.fetch("SELECT (latitude, longitude, lockerId) FROM locker;")
+    async with current_app.db.acquire() as conn:
+
+        lockerRows = await conn.fetch("SELECT (latitude, longitude, lockerId) FROM locker;")
     nodes = []
     for row in lockerRows:
         print(row["row"])
@@ -301,7 +318,9 @@ async def getLockerLocations():
 @distributorbp.route('/user/getid', methods=["GET"])
 async def usernameToUserId():
     username = request.args.get("username")
-    rowReturned = await current_app.db.fetchrow("SELECT distributorId FROM distributor WHERE username = $1", username)
+    async with current_app.db.acquire() as conn:
+
+        rowReturned = await conn.fetchrow("SELECT distributorId FROM distributor WHERE username = $1", username)
     print(rowReturned)
     return dumps({"user_id": rowReturned["distributorid"]}), 200
 

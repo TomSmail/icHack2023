@@ -1,4 +1,5 @@
 window.onload = loadcode();
+flipped = false;
 
 var map = L.map('map')
 
@@ -27,7 +28,7 @@ async function loadcode() {
             })
         .catch(err => console.log('Fetch Error :-S', err));
 
-    fetch('api/distributor/user/get_routes')
+    fetch('api/distributor/user/get_route_parts')
         .then(
             response => {
                 if (response.status !== 200) {
@@ -65,6 +66,8 @@ collection = []
 function selectRoute(elem) {
 
     tm = document.getElementById("secondary");
+    flipped = true;
+
     tm.classList.add("hidden");
     map.invalidateSize();
 
@@ -90,19 +93,19 @@ function selectRoute(elem) {
                     startlockerpos = { "lat": 51.51576514449153, "lon": -0.17545614963098652 }
                     endlockerpos = { "lat": 51.50075273293234, "lon": -0.18367794301514892 }
 
-                    map.setView([(startpos["lat"] + endpos["lat"]) / 2, (startpos["lon"] + endpos["lon"]) / 2], 13);
+                    map.setView([(data.startPos["lat"] + data.endPos["lat"]) / 2, (data.startPos["lon"] + data.endPos["lon"]) / 2], 13);
 
 
-                    var startmarker = L.marker([startpos.lat, startpos.lon]);
-                    var endmarker = L.marker([endpos.lat, endpos.lon]);
+                    var startmarker = L.marker([data.startPos.lat, data.startPos.lon]);
+                    var endmarker = L.marker([data.endPos.lat, data.endPos.lon]);
 
-                    var startlocker = L.marker([startlockerpos.lat, startlockerpos.lon]);
-                    var endlocker = L.marker([endlockerpos.lat, endlockerpos.lon]);
+                    var startlocker = L.marker([data.startLocker.lat, data.startLocker.lon]);
+                    var endlocker = L.marker([data.endLocker.lat, data.endLocker.lon]);
 
-                    var polyroute = L.polyline([[startpos.lat, startpos.lon],
-                    [startlockerpos.lat, startlockerpos.lon],
-                    [endlockerpos.lat, endlockerpos.lon],
-                    [endpos.lat, endpos.lon]],
+                    var polyroute = L.polyline([[data.startPos.lat, data.startPos.lon],
+                    [data.startLocker.lat, data.startLocker.lon],
+                    [data.endLocker.lat, data.endLocker.lon],
+                    [data.endPos.lat, data.endPos.lon]],
                         {
                             color: 'red',
                             weight: 3,
@@ -148,7 +151,6 @@ function profileButton(name, balance, profilePicUrl) {
 
 // flip
 
-flipped = false;
 
 function flip() {
 

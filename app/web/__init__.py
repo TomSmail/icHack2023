@@ -9,8 +9,6 @@ async def index():
     return await webbp.send_static_file("index.html")
 
 
-
-
 @webbp.route('/register')
 async def rerg():
     if request.method == "GET":
@@ -28,8 +26,13 @@ async def logine():
         fm = await request.form
         username = fm['username']
         pw = fm['psw']  # lmao
-        row = await current_app.db.fetchrow(
-            'SELECT distributorId FROM distributor WHERE username = $1', username)
+
+        # row = await current_app.db.fetchrow(
+        #    'SELECT distributorId FROM distributor WHERE username = $1', username
+
+        async with current_app.db._pool.acquire() as conn:
+            row = await conn.fetchrow(
+                'SELECT distributorId FROM distributor WHERE username = $1', username)
         print(row)
         if row == None:
             resp = await make_response(redirect(url_for("web.rerg")))

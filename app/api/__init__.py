@@ -227,7 +227,7 @@ async def getLockerLocations():
     return dumps({"lockers": nodes}), 200
 
 # GET - username to user id
-@distributorbp.route('/locker/getall', methods = ["GET"])
+@distributorbp.route('/user/getid', methods = ["GET"])
 async def usernameToUserId():
     username = request.args.get()["username"]
     rowReturned = await current_app.db.fetchrow("SELECT distributorId FROM distributor WHERE username = $1", username)
